@@ -63,6 +63,22 @@ class CAMSData(FData):
         self.cnbal = { pidcname[pid]:bo for pid,bo in pidbal.items() }
         self.cntxns = { pidcname[pid]:to for pid,to in pidtxns.items() }
 
+class SBMatch:
+    def handlebuy(self,t): self.bq = self.bq + [(t.units,t)]
+    def _sbmatch(self,tgtu,matches,bq):
+        bu,bt = bq[0]
+        return (matches,bq) if tgtu < 0.0001 else \
+            ( matches+[(tgtu,bt)], [(bu-tgtu,bt)]+bq[1:] ) if tgtu < bu else \
+            self._sbmatch(tgtu-bu,matches+[(bu,bt)],bq[1:])
+    def handlesale(self,t):
+        matches,rembq =  self._sbmatch(-t.units,[],self.bq)
+        self.sbmatch = self.sbmatch + [(t,matches)]
+        self.bq = rembq
+    def __init__(self,txns):
+        self.bq = []
+        self.sbmatch = []
+        [ self.handlebuy(t) if t.amt > 0 else self.handlesale(t) for t in txns if t.amt ]
+
 class PFObj:
     def value(self): return self.bo.value
     def cagr(self): return 0
@@ -79,6 +95,7 @@ class PFObj:
         self.bo = cd.cnbal[f]
         self._amc = cd.cntxns[f][0].amc
         self.vo = vd.cnvo.get(f,None)
+        self.sbmatch = SBMatch(cd.cntxns[f])
 
 class PFData:
     def by(self,p): return groupby(sorted(self.pfobjs,key=lambda o:str(o.get(p))),lambda o:o.get(p))
