@@ -19,6 +19,8 @@ Goal of this tool is to produce quick text form reports such as these:
 
 ## Pre-requisites
 
+- Python3
+
 - xls2pyobj: https://github.com/mayureshw/xls2pyobj
 
 ## Environment variables:
@@ -50,8 +52,11 @@ using command like:
 ## Getting transaction history from registrar
 
 Visit CAMS website and use their mailback service for the Transaction Details
-statement. unzip the file. You should get 2 spread sheets namely bals.xls and
-txns.xls.
+statement. unzip the file. You should get 2 spread sheets.
+
+Rename the file with name AS*.xls as txns.xls
+
+Rename the file with name CurrentValuation*.xls as bals.xls.
 
 ## Generating report
 
