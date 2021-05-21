@@ -70,3 +70,19 @@ The output files will be produced in cwd as follows:
         - AMC-wise, Category-wise, Subcategory-wise views with percentage share
           of each
 
+    pfgainreports.txt:
+
+        - Unrealized gain for each Buy transaction as of NAV date in the
+          statement.
+
+        - Typ: EQ or DT from taxation point of view, Free: True if Buy txn held
+          for more than 365 days for type EQ and 365*3 days for type DT. Rest
+          of the fields are more or less similar to pfreport.
+
+        - The report is sorted by Type, Free status, CAGR and VR Rating. For
+          short term holdings CAGR does not make sense and they are also not
+          good candidates to sale as there are tax implications, hence they
+          come later. Then higher CAGR and lower VR rating come, so that you
+          can prioritize to sale investments that have given you good returns
+          but aren't doing so well on VR rating.
+

@@ -2,6 +2,7 @@ from xls2obj import XlsObjs
 from conf import *
 from itertools import groupby
 from functools import reduce
+from functools import lru_cache
 from datetime import datetime
 import sys
 import re
@@ -66,16 +67,24 @@ class CAMSData(FData):
 
 class Match:
     eqtyp = {'Equity','Balanced','Index Fund'}
+    @lru_cache(maxsize=1)
     def curnav(self): return self.balo.value/self.balo.units
+    @lru_cache(maxsize=1)
     def tnav(self,t): return t.amt/t.units
+    @lru_cache(maxsize=1)
     def holdyrs(self,t,sdt): return (sdt-t.txndt).days/365
+    @lru_cache(maxsize=1)
+    def cost(self): return self.bt.amt*self.units/self.bt.units
+    @lru_cache(maxsize=1)
+    def value(self): return (self.st.amt*self.units/self.st.units) if self.st else \
+        self.balo.value*self.units/self.balo.units
+    @lru_cache(maxsize=1)
     def cagr(self):
         curnav = self.curnav()
         snav = self.tnav(self.st) if self.st else self.curnav()
         bnav = self.tnav(self.bt)
         hldyrs = self.holdyrs(self.bt,self.st.txndt if self.st else self.balo.navdt)
-        retval = ( pow(curnav/bnav,1/hldyrs) - 1 ) if bnav and hldyrs else 0
-        return retval
+        return 100*( pow(curnav/bnav,1/hldyrs) - 1 ) if bnav and hldyrs else 0
     def __init__(self,units,bt,balo,st=None):
         self.units = units
         self.bt = bt
@@ -85,7 +94,8 @@ class Match:
         self.isfree = (datetime.today() - self.bt.txndt).days > 365*(1 if self.iseq else 3)
 
 class SBMatch:
-    def cagr(self): return 100*sum(mo.cagr()*mo.units for mo in self.bq)/self.bo.units
+    @lru_cache(maxsize=1)
+    def cagr(self): return sum(mo.cagr()*mo.units for mo in self.bq)/self.bo.units
     def handlebuy(self,t): self.bq = self.bq + [Match(t.units,t,self.bo)]
     def _sbmatch(self,tgtu,matches,bq,st):
         bq0 = bq[0]
@@ -123,6 +133,7 @@ class PFObj:
 
 class PFData:
     def by(self,p): return groupby(sorted(self.pfobjs,key=lambda o:str(o.get(p))),lambda o:o.get(p))
+    def buymatches(self): return [ (mo,po) for po in self.pfobjs for mo in po.sbmatch.bq ]
     def __init__(self):
         cd = CAMSData()
         vd = VRMFData()
