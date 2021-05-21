@@ -1,3 +1,5 @@
+import sys
+
 def multisort(tbl,l): return tbl if l==[] else \
     sorted(multisort(tbl,l[1:]),key=lambda x:x[abs(l[0])-1],reverse=l[0]<0)
 
@@ -12,10 +14,11 @@ def printTbl(tbl,
     sort=[],        # 1 based column no w/ -sign to indicate reverse in tbl
     colnames=None,
     formaters={},   # 1 based keys : formatstr in tbl
+    file=sys.stdout
     ):
     if title:
-        print(title)
-        print('='*len(title),'\n')
+        print(title,file=file)
+        print('='*len(title),'\n',file=file)
 
     stbl = multisort(tbl,sort)
 
@@ -31,7 +34,7 @@ def printTbl(tbl,
 
     print('\n'.join(
         '  '.join( c.rjust(widths[i]) for i,c in enumerate(r) ) for r in projcul
-        ))
+        ),file=file)
     
 # Test driver
 if __name__=='__main__':

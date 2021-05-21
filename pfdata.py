@@ -64,6 +64,7 @@ class CAMSData(FData):
         self.cntxns = { pidcname[pid]:to for pid,to in pidtxns.items() }
 
 class SBMatch:
+    eqtyp = {'Equity','Balanced','Index Fund'}
     def curnav(self): return self.bo.value/self.bo.units
     def tnav(self,t): return t.amt/t.units
     def txnage(self,t): return (self.bo.navdt-t.txndt).days/365

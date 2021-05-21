@@ -5,15 +5,7 @@ Mutual fund investment tracking tool for Indian Mutual Funds.
 Currently only CAMS serviced funds and Value Research analysis data is
 supported. Support for more registrars may be added in future.
 
-Goal of this tool is to produce quick text form reports such as these:
-
-- total portfolio value, cost and gain
-
-- fund-wise view sorted by Value Research sub-category with information such as
-  cost, value, gain, % gain, CAGR, % of your portfolio value, Value Research
-  Rating, 1 year Return, sub-category
-
-- AMC-wise, Category-wise, Subcategory-wise views with percentage share of each
+Produces simple text form reports described in Usage section.
 
 # Installation
 
@@ -63,5 +55,18 @@ Rename the file with name CurrentValuation*.xls as bals.xls.
 Do check that the environment variables section and ensure that all files are
 at locations as specified there. Then run:
 
-    pfviews.py > pfreport.txt
+    pfviews.py
+
+The output files will be produced in cwd as follows:
+
+    pfreports.txt: 
+
+        - total portfolio value, cost and gain
+        
+        - fund-wise view sorted by Value Research sub-category with information
+          such as cost, value, gain, % gain, CAGR, % of your portfolio value,
+          Value Research Rating, 1 year Return, sub-category
+        
+        - AMC-wise, Category-wise, Subcategory-wise views with percentage share
+          of each
 
