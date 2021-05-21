@@ -64,6 +64,16 @@ class CAMSData(FData):
         self.cntxns = { pidcname[pid]:to for pid,to in pidtxns.items() }
 
 class SBMatch:
+    def curnav(self): return self.bo.value/self.bo.units
+    def tnav(self,t): return t.amt/t.units
+    def txnage(self,t): return (self.bo.navdt-t.txndt).days/365
+    def _cagr(self,bt):
+        curnav = self.curnav()
+        bnav = self.tnav(bt)
+        bage = self.txnage(bt)
+        retval = ( pow(curnav/bnav,1/bage) - 1 ) if bnav and bage else 0
+        return retval
+    def cagr(self): return 100*sum(self._cagr(bt)*u for u,bt in self.bq)/self.bo.units
     def handlebuy(self,t): self.bq = self.bq + [(t.units,t)]
     def _sbmatch(self,tgtu,matches,bq):
         bu,bt = bq[0]
@@ -74,14 +84,15 @@ class SBMatch:
         matches,rembq =  self._sbmatch(-t.units,[],self.bq)
         self.sbmatch = self.sbmatch + [(t,matches)]
         self.bq = rembq
-    def __init__(self,txns):
+    def __init__(self,txns,bo):
+        self.bo = bo
         self.bq = []
         self.sbmatch = []
-        [ self.handlebuy(t) if t.amt > 0 else self.handlesale(t) for t in txns if t.amt ]
+        [ self.handlebuy(t) if t.units > 0 else self.handlesale(t) for t in txns if t.units ]
 
 class PFObj:
     def value(self): return self.bo.value
-    def cagr(self): return 0
+    def cagr(self): return self.sbmatch.cagr()
     def cost(self): return self.bo.cost
     def rating(self): return self.vo.rating if self.vo and self.vo.rating else '-'
     def oyret(self): return self.vo.oyret if self.vo else '-'
@@ -95,7 +106,7 @@ class PFObj:
         self.bo = cd.cnbal[f]
         self._amc = cd.cntxns[f][0].amc
         self.vo = vd.cnvo.get(f,None)
-        self.sbmatch = SBMatch(cd.cntxns[f])
+        self.sbmatch = SBMatch(cd.cntxns[f],self.bo)
 
 class PFData:
     def by(self,p): return groupby(sorted(self.pfobjs,key=lambda o:str(o.get(p))),lambda o:o.get(p))

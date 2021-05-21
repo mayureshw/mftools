@@ -10,8 +10,8 @@ Goal of this tool is to produce quick text form reports such as these:
 - total portfolio value, cost and gain
 
 - fund-wise view sorted by Value Research sub-category with information such as
-  cost, value, gain, % gain, CAGR (to be added), % of your portfolio value,
-  Value Research Rating, 1 year Rating, sub-category
+  cost, value, gain, % gain, CAGR, % of your portfolio value, Value Research
+  Rating, 1 year Return, sub-category
 
 - AMC-wise, Category-wise, Subcategory-wise views with percentage share of each
 

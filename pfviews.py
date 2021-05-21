@@ -29,7 +29,7 @@ if __name__ == '__main__':
         proj = None,
         sort = [10,-4],
         colnames = ['Fund','Cost','Value','Gain','%Gain','CAGR','% pf','Rat','1YRet','Subcat'],
-        formaters = {5:'%5.2f', 7:'%4.2f',9:'%5.2f',10:'%-11s'}
+        formaters = {5:'%5.2f', 6:'%5.2f', 7:'%4.2f', 9:'%5.2f', 10:'%-11s'}
         )
     print('\n')
     printTbl(pf.pshare(pf.aggr('amc')),
