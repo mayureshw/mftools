@@ -61,7 +61,7 @@ The output files will be produced in cwd as follows:
 
     pfreports.txt: 
 
-        - total portfolio value, cost and gain
+        - total portfolio value, cost and gain, %gain, CAGR
         
         - fund-wise view sorted by Value Research sub-category with information
           such as cost, value, gain, % gain, CAGR, % of your portfolio value,
