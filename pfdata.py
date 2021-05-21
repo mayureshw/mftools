@@ -2,6 +2,7 @@ from xls2obj import XlsObjs
 from conf import *
 from itertools import groupby
 from functools import reduce
+from datetime import datetime
 import sys
 import re
 
@@ -63,26 +64,37 @@ class CAMSData(FData):
         self.cnbal = { pidcname[pid]:bo for pid,bo in pidbal.items() }
         self.cntxns = { pidcname[pid]:to for pid,to in pidtxns.items() }
 
-class SBMatch:
+class Match:
     eqtyp = {'Equity','Balanced','Index Fund'}
-    def curnav(self): return self.bo.value/self.bo.units
+    def curnav(self): return self.balo.value/self.balo.units
     def tnav(self,t): return t.amt/t.units
-    def txnage(self,t): return (self.bo.navdt-t.txndt).days/365
-    def _cagr(self,bt):
+    def holdyrs(self,t,sdt): return (sdt-t.txndt).days/365
+    def cagr(self):
         curnav = self.curnav()
-        bnav = self.tnav(bt)
-        bage = self.txnage(bt)
-        retval = ( pow(curnav/bnav,1/bage) - 1 ) if bnav and bage else 0
+        snav = self.tnav(self.st) if self.st else self.curnav()
+        bnav = self.tnav(self.bt)
+        hldyrs = self.holdyrs(self.bt,self.st.txndt if self.st else self.balo.navdt)
+        retval = ( pow(curnav/bnav,1/hldyrs) - 1 ) if bnav and hldyrs else 0
         return retval
-    def cagr(self): return 100*sum(self._cagr(bt)*u for u,bt in self.bq)/self.bo.units
-    def handlebuy(self,t): self.bq = self.bq + [(t.units,t)]
-    def _sbmatch(self,tgtu,matches,bq):
-        bu,bt = bq[0]
+    def __init__(self,units,bt,balo,st=None):
+        self.units = units
+        self.bt = bt
+        self.balo = balo
+        self.st = st
+        self.iseq = self.balo.typ in self.eqtyp
+        self.isfree = (datetime.today() - self.bt.txndt).days > 365*(1 if self.iseq else 3)
+
+class SBMatch:
+    def cagr(self): return 100*sum(mo.cagr()*mo.units for mo in self.bq)/self.bo.units
+    def handlebuy(self,t): self.bq = self.bq + [Match(t.units,t,self.bo)]
+    def _sbmatch(self,tgtu,matches,bq,st):
+        bq0 = bq[0]
+        bu,bt = bq0.units,bq0.bt
         return (matches,bq) if tgtu < 0.0001 else \
-            ( matches+[(tgtu,bt)], [(bu-tgtu,bt)]+bq[1:] ) if tgtu < bu else \
-            self._sbmatch(tgtu-bu,matches+[(bu,bt)],bq[1:])
+            ( matches+[Match(tgtu,bt,self.bo,st)], [Match(bu-tgtu,bt,self.bo)]+bq[1:] ) if tgtu < bu else \
+            self._sbmatch(tgtu-bu,matches+[Match(bu,bt,self.bo,st)],bq[1:],st)
     def handlesale(self,t):
-        matches,rembq =  self._sbmatch(-t.units,[],self.bq)
+        matches,rembq =  self._sbmatch(-t.units,[],self.bq,t)
         self.sbmatch = self.sbmatch + [(t,matches)]
         self.bq = rembq
     def __init__(self,txns,bo):

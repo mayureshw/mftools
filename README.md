@@ -50,7 +50,7 @@ Rename the file with name AS*.xls as txns.xls
 
 Rename the file with name CurrentValuation*.xls as bals.xls.
 
-## Generating report
+## Generating reports
 
 Do check that the environment variables section and ensure that all files are
 at locations as specified there. Then run:
