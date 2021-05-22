@@ -5,14 +5,24 @@ from reports import printTbl
 from functools import lru_cache
 
 class PFViews(PFData):
+    # TODO: Reuse aggr
     @lru_cache(maxsize=1)
     def value(self): return sum(o.value() for o in self.pfobjs)
     @lru_cache(maxsize=1)
     def cost(self): return sum(o.cost() for o in self.pfobjs)
     def gain(self): return self.value() - self.cost()
-    def cagr(self): return sum(o.cost()*o.cagr() for o,po in self.buymatches())/self.cost()
-    def pshare(self,l): return [ (p,v,v*100/self.value()) for p,v in l ]
-    def aggr(self,p): return [ (p,sum(o.value() for o in os)) for p,os in self.by(p) ]
+    def cagr(self): return sum(o.cost()*o.cagr() for o,po in self.buymatches())/self.cost() # TODO wrong, need match object level
+    def _cagr(self,o): return sum(mo.cagr()*mo.cost() for mo in o.sbmatch.bq)
+    def _aggr(self,os):
+        costs,values,cagrs = zip(*[ (o.cost(),o.value(),self._cagr(o)) for o in os ])
+        cost = sum(costs)
+        value = sum(values)
+        gain = value - cost
+        pgain = gain*100/cost if cost else '-'
+        pshare = value*100/self.value()
+        cagr = sum(cagrs)/cost if cost else '-'
+        return (cost,value,gain,pgain,cagr,pshare)
+    def aggr(self,p): return [ (pv,*self._aggr(os)) for pv,os in self.by(p) ]
     def pfgainreport(self):
         fp = open('pfgainreport.txt','w')
         printTbl([[
@@ -62,37 +72,14 @@ class PFViews(PFData):
             file=fp,
             )
         print('\n',file=fp)
-        printTbl(self.pshare(self.aggr('amc')),
-            title = 'AMC WISE',
-            sort = [-2],
-            colnames = ['AMC','AMOUNT','% share'],
-            formaters = {2:'%8.0f',3:'%4.2f'},
+        pname = {'amc':'AMC','rating':'RATING','cat':'CATEGORY','subcat':'SUBCATEGORY'}
+        [ printTbl(self.aggr(p),
+            title = pname[p] + ' WISE',
+            sort = [-3],
+            colnames = [pname[p],'Cost','Value','Gain','%Gain','CAGR','% share'],
+            formaters = {2:'%8.0f',3:'%8.0f',4:'%8.0f',5:'%5.2f',6:'%5.2f',7:'%5.2f'},
             file=fp,
-            )
-        print('\n',file=fp)
-        printTbl(self.pshare(self.aggr('rating')),
-            title = 'RATING WISE',
-            sort = [-2],
-            colnames = ['RATING','AMOUNT','% share'],
-            formaters = {2:'%8.0f',3:'%4.2f'},
-            file=fp,
-            )
-        print('\n',file=fp)
-        printTbl(self.pshare(self.aggr('cat')),
-            title = 'CATEGORY WISE',
-            sort = [-2],
-            colnames = ['CATEGORY','AMOUNT','% share'],
-            formaters = {2:'%8.0f',3:'%4.2f'},
-            file=fp,
-            )
-        print('\n',file=fp)
-        printTbl(self.pshare(self.aggr('subcat')),
-            title = 'SUBCATEGORY WISE',
-            sort = [-2],
-            colnames = ['SUBCATEGORY','AMOUNT','% share'],
-            formaters = {1:'%-11s',2:'%8.0f',3:'%4.2f'},
-            file=fp,
-            )
+            ) for p in ['amc','rating','cat','subcat'] ]
         fp.close()
 
 if __name__ == '__main__':
