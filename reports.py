@@ -1,7 +1,10 @@
 import sys
 
+class cmpr:
+    def __lt__(self,o): return  type(o.v) == type(self.v) and self.v < o.v
+    def __init__(self,v): self.v = v
 def multisort(tbl,l): return tbl if l==[] else \
-    sorted(multisort(tbl,l[1:]),key=lambda x:x[abs(l[0])-1],reverse=l[0]<0)
+    sorted(multisort(tbl,l[1:]),key=lambda x:cmpr(x[abs(l[0])-1]),reverse=l[0]<0)
 
 # Pardon wrong / unsuitable format strings
 def fmt(fmts,d):

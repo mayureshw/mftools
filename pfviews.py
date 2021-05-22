@@ -70,7 +70,7 @@ class PFViews(PFData):
             )
         [ printTbl(self.aggr(p),
             title = pname[p] + ' WISE',
-            sort = [-3],
+            sort = [-6],
             colnames = [pname[p],'Cost','Value','Gain','%Gain','CAGR','%pf'],
             formaters = fmt,
             file=fp,
