@@ -71,7 +71,7 @@ class PFViews(PFData):
         [ printTbl(self.aggr(p),
             title = pname[p] + ' WISE',
             sort = [-3],
-            colnames = [pname[p],'Cost','Value','Gain','%Gain','CAGR','% share'],
+            colnames = [pname[p],'Cost','Value','Gain','%Gain','CAGR','%pf'],
             formaters = fmt,
             file=fp,
             ) for p in ['amc','rating','cat','subcat'] ]
