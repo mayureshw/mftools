@@ -5,13 +5,8 @@ from reports import printTbl
 from functools import lru_cache
 
 class PFViews(PFData):
-    # TODO: Reuse aggr
     @lru_cache(maxsize=1)
     def value(self): return sum(o.value() for o in self.pfobjs)
-    @lru_cache(maxsize=1)
-    def cost(self): return sum(o.cost() for o in self.pfobjs)
-    def gain(self): return self.value() - self.cost()
-    def cagr(self): return sum(o.cost()*o.cagr() for o,po in self.buymatches())/self.cost() # TODO wrong, need match object level
     def _cagr(self,o): return sum(mo.cagr()*mo.cost() for mo in o.sbmatch.bq)
     def _aggr(self,os):
         costs,values,cagrs = zip(*[ (o.cost(),o.value(),self._cagr(o)) for o in os ])
@@ -22,6 +17,7 @@ class PFViews(PFData):
         pshare = value*100/self.value()
         cagr = sum(cagrs)/cost if cost else '-'
         return (cost,value,gain,pgain,cagr,pshare)
+    @lru_cache(maxsize=16)
     def aggr(self,p): return [ (pv,*self._aggr(os)) for pv,os in self.by(p) ]
     def pfgainreport(self):
         fp = open('pfgainreport.txt','w')
@@ -52,10 +48,13 @@ class PFViews(PFData):
         fp.close()
     def pfreport(self):
         fp = open('pfreport.txt','w')
-        printTbl([[self.cost(),self.value(),self.gain(),self.gain()*100/self.cost(),self.cagr()]],
-            title = 'TOTAL VALUE',
+        pname = {'amc':'AMC','rating':'RATING','cat':'CATEGORY','subcat':'SUBCATEGORY'}
+        fmt = {2:'%8.0f',3:'%8.0f',4:'%8.0f',5:'%5.2f',6:'%5.2f',7:'%5.2f'}
+        printTbl(self.aggr('_wildcard'),
+            proj = [2,3,4,5,6],
+            title = 'TOTAL',
             colnames = ['Cost','Value','Gain','%Gain','CAGR'],
-            formaters = {1:'%8.0f',2:'%8.0f',3:'%8.0f',4:'%5.2f',5:'%5.2f'},
+            formaters = fmt,
             file=fp,
             )
         printTbl([[
@@ -69,12 +68,11 @@ class PFViews(PFData):
             formaters = {5:'%5.2f', 6:'%5.2f', 7:'%5.2f', 9:'%4.2f', 10:'%-11s'},
             file=fp,
             )
-        pname = {'amc':'AMC','rating':'RATING','cat':'CATEGORY','subcat':'SUBCATEGORY'}
         [ printTbl(self.aggr(p),
             title = pname[p] + ' WISE',
             sort = [-3],
             colnames = [pname[p],'Cost','Value','Gain','%Gain','CAGR','% share'],
-            formaters = {2:'%8.0f',3:'%8.0f',4:'%8.0f',5:'%5.2f',6:'%5.2f',7:'%5.2f'},
+            formaters = fmt,
             file=fp,
             ) for p in ['amc','rating','cat','subcat'] ]
         fp.close()

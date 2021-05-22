@@ -114,6 +114,7 @@ class SBMatch:
         [ self.handlebuy(t) if t.units > 0 else self.handlesale(t) for t in txns if t.units ]
 
 class PFObj:
+    def _wildcard(self): return 0
     def value(self): return self.bo.value
     def cagr(self): return self.sbmatch.cagr()
     def cost(self): return self.bo.cost
