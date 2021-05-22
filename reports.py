@@ -34,7 +34,7 @@ def printTbl(tbl,
 
     print('\n'.join(
         '  '.join( c.rjust(widths[i]) for i,c in enumerate(r) ) for r in projcul
-        ),file=file)
+        ),'\n',file=file)
     
 # Test driver
 if __name__=='__main__':

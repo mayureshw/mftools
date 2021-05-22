@@ -52,14 +52,12 @@ class PFViews(PFData):
         fp.close()
     def pfreport(self):
         fp = open('pfreport.txt','w')
-        print('\n',file=fp)
         printTbl([[self.cost(),self.value(),self.gain(),self.gain()*100/self.cost(),self.cagr()]],
             title = 'TOTAL VALUE',
             colnames = ['Cost','Value','Gain','%Gain','CAGR'],
             formaters = {1:'%8.0f',2:'%8.0f',3:'%8.0f',4:'%5.2f',5:'%5.2f'},
             file=fp,
             )
-        print('\n',file=fp)
         printTbl([[
             o.shortf(), o.cost(), o.value(), o.value()-o.cost(),
             ((o.value()-o.cost())*100/o.cost()) if o.cost() else '-',
@@ -71,7 +69,6 @@ class PFViews(PFData):
             formaters = {5:'%5.2f', 6:'%5.2f', 7:'%5.2f', 9:'%4.2f', 10:'%-11s'},
             file=fp,
             )
-        print('\n',file=fp)
         pname = {'amc':'AMC','rating':'RATING','cat':'CATEGORY','subcat':'SUBCATEGORY'}
         [ printTbl(self.aggr(p),
             title = pname[p] + ' WISE',
