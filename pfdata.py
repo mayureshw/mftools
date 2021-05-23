@@ -80,11 +80,10 @@ class Match:
         self.balo.value*self.units/self.balo.units
     @lru_cache(maxsize=1)
     def cagr(self):
-        curnav = self.curnav()
         snav = self.tnav(self.st) if self.st else self.curnav()
         bnav = self.tnav(self.bt)
         hldyrs = self.holdyrs(self.bt,self.st.txndt if self.st else self.balo.navdt)
-        return 100*( pow(curnav/bnav,1/hldyrs) - 1 ) if bnav and hldyrs else 0
+        return 100*( pow(self.curnav()/bnav,1/hldyrs) - 1 ) if bnav and hldyrs else 0
     def __init__(self,units,bt,balo,st=None):
         self.units = units
         self.bt = bt
