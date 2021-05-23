@@ -92,7 +92,17 @@ class Match:
         self.iseq = self.balo.typ in self.eqtyp
         self.isfree = (datetime.today() - self.bt.txndt).days > 365*(1 if self.iseq else 3)
 
-class SBMatch:
+class PFObj:
+    def _wildcard(self): return 0
+    def value(self): return self.bo.value
+    def cost(self): return self.bo.cost
+    def rating(self): return self.vo.rating if self.vo and self.vo.rating else '-'
+    def oyret(self): return self.vo.oyret if self.vo else '-'
+    def amc(self): return self._amc
+    def cat(self): return self.vo.cat.split('-')[0] if self.vo else '-'
+    def subcat(self): return self.vo.cat if self.vo else '-'
+    def shortf(self): return self.f[:30]
+    def get(self,p): return getattr(self,p)()
     @lru_cache(maxsize=1)
     def cagr(self): return sum(mo.cagr()*mo.units for mo in self.bq)/self.bo.units
     def handlebuy(self,t): self.bq = self.bq + [Match(t.units,t,self.bo)]
@@ -106,34 +116,20 @@ class SBMatch:
         matches,rembq =  self._sbmatch(-t.units,[],self.bq,t)
         self.sbmatch = self.sbmatch + [(t,matches)]
         self.bq = rembq
-    def __init__(self,txns,bo):
-        self.bo = bo
+    def buildmatch(self,txns):
         self.bq = []
         self.sbmatch = []
         [ self.handlebuy(t) if t.units > 0 else self.handlesale(t) for t in txns if t.units ]
-
-class PFObj:
-    def _wildcard(self): return 0
-    def value(self): return self.bo.value
-    def cagr(self): return self.sbmatch.cagr()
-    def cost(self): return self.bo.cost
-    def rating(self): return self.vo.rating if self.vo and self.vo.rating else '-'
-    def oyret(self): return self.vo.oyret if self.vo else '-'
-    def amc(self): return self._amc
-    def cat(self): return self.vo.cat.split('-')[0] if self.vo else '-'
-    def subcat(self): return self.vo.cat if self.vo else '-'
-    def shortf(self): return self.f[:30]
-    def get(self,p): return getattr(self,p)()
     def __init__(self,f,cd,vd):
         self.f = f
         self.bo = cd.cnbal[f]
         self._amc = cd.cntxns[f][0].amc
         self.vo = vd.cnvo.get(f,None)
-        self.sbmatch = SBMatch(cd.cntxns[f],self.bo)
+        self.buildmatch(cd.cntxns[f])
 
 class PFData:
     def by(self,p): return groupby(sorted(self.pfobjs,key=lambda o:str(o.get(p))),lambda o:o.get(p))
-    def buymatches(self): return [ (mo,po) for po in self.pfobjs for mo in po.sbmatch.bq ]
+    def buymatches(self): return [ (mo,po) for po in self.pfobjs for mo in po.bq ]
     def __init__(self):
         cd = CAMSData()
         vd = VRMFData()

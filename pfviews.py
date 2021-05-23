@@ -7,7 +7,7 @@ from functools import lru_cache
 class PFViews(PFData):
     @lru_cache(maxsize=1)
     def value(self): return sum(o.value() for o in self.pfobjs)
-    def _cagr(self,o): return sum(mo.cagr()*mo.cost() for mo in o.sbmatch.bq)
+    def _cagr(self,o): return sum(mo.cagr()*mo.cost() for mo in o.bq)
     def _aggr(self,os):
         costs,values,cagrs = zip(*[ (o.cost(),o.value(),self._cagr(o)) for o in os ])
         cost = sum(costs)
