@@ -128,9 +128,9 @@ class Fund:
         self.buildmatch(cd.cntxns[f])
 
 class Portfolio:
-    def by(self,p): return groupby(sorted(self.pfobjs,key=lambda o:str(o.get(p))),lambda o:o.get(p))
-    def buymatches(self): return [ (mo,po) for po in self.pfobjs for mo in po.bq ]
+    def by(self,p): return groupby(sorted(self.holdings,key=lambda o:str(o.get(p))),lambda o:o.get(p))
+    def buymatches(self): return [ (mo,po) for po in self.holdings for mo in po.bq ]
     def __init__(self):
         cd = CAMSData()
         vd = VRMFData()
-        self.pfobjs = { Fund(f,cd,vd) for f in cd.cnbal }
+        self.holdings = { Fund(f,cd,vd) for f in cd.cnbal }

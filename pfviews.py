@@ -6,7 +6,7 @@ from functools import lru_cache
 
 class PFViews(Portfolio):
     @lru_cache(maxsize=1)
-    def value(self): return sum(o.value() for o in self.pfobjs)
+    def value(self): return sum(o.value() for o in self.holdings)
     def _cagr(self,o): return sum(mo.cagr()*mo.cost() for mo in o.bq)
     def _aggr(self,os):
         costs,values,cagrs = zip(*[ (o.cost(),o.value(),self._cagr(o)) for o in os ])
@@ -61,7 +61,7 @@ class PFViews(Portfolio):
             o.shortf(), o.cost(), o.value(), o.value()-o.cost(),
             ((o.value()-o.cost())*100/o.cost()) if o.cost() else '-',
             o.cagr(), o.oyret(), o.rating(), o.value()*100/self.value(), o.subcat()
-            ] for o in self.pfobjs],
+            ] for o in self.holdings],
             title = 'FUND WISE',
             sort = [10,-4],
             colnames = ['Fund','Cost','Value','Gain','%Gain','CAGR','1YRet','Rat','%pf','Subcat'],
