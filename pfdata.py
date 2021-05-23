@@ -129,7 +129,8 @@ class Fund:
 
 class Portfolio:
     def by(self,p): return groupby(sorted(self.holdings,key=lambda o:str(o.get(p))),lambda o:o.get(p))
-    def buymatches(self): return [ (mo,po) for po in self.holdings for mo in po.bq ]
+    def urg_sbmatches(self): return [ (po,mo) for po in self.holdings for mo in po.bq ]
+    def rg_sbmatches(self): return [ (po,st,mos) for po in self.holdings for (st,mos) in po.sbmatch ]
     def __init__(self):
         cd = CAMSData()
         vd = VRMFData()

@@ -22,21 +22,21 @@ class PFViews(Portfolio):
     def pfgainreport(self):
         fp = open('pfgainreport.txt','w')
         printTbl([[
-            'EQ' if o.iseq else 'DT', #1
-            o.isfree, #2
+            'EQ' if mo.iseq else 'DT', #1
+            mo.isfree, #2
             po.shortf(), #3
-            o.bt.txndt.strftime('%y%m%d'), #4
-            o.units, #5
-            o.cost(), #6
-            o.value(), #7
-            o.value() - o.cost(), #8
-            ((o.value()-o.cost())*100/o.cost()) if o.cost() else '-', #9
-            o.cagr(), #10
+            mo.bt.txndt.strftime('%y%m%d'), #4
+            mo.units, #5
+            mo.cost(), #6
+            mo.value(), #7
+            mo.value() - mo.cost(), #8
+            ((mo.value()-mo.cost())*100/mo.cost()) if mo.cost() else '-', #9
+            mo.cagr(), #10
             str(po.rating()), #11
             po.oyret(), #12
             po.subcat(), #13
             ]
-            for o,po in self.buymatches()],
+            for po,mo in self.urg_sbmatches()],
             title = 'PFGAIN',
             colnames = ['Typ','Free','Fund','Date','Units','Cost','Value','Gain','%Gain','CAGR','Rat',
                 '1YRet','Subcat'],
@@ -46,6 +46,7 @@ class PFViews(Portfolio):
             file=fp
             )
         fp.close()
+    def rgainreport(self): pass
     def pfreport(self):
         fp = open('pfreport.txt','w')
         pname = {'amc':'AMC','rating':'RATING','cat':'CATEGORY','subcat':'SUBCATEGORY'}
@@ -81,3 +82,4 @@ if __name__ == '__main__':
     pfv = PFViews()
     pfv.pfreport()
     pfv.pfgainreport()
+    pfv.rgainreport()
