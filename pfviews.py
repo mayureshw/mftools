@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-from pfdata import PFData
+from pfdata import Portfolio
 from reports import printTbl
 from functools import lru_cache
 
-class PFViews(PFData):
+class PFViews(Portfolio):
     @lru_cache(maxsize=1)
     def value(self): return sum(o.value() for o in self.pfobjs)
     def _cagr(self,o): return sum(mo.cagr()*mo.cost() for mo in o.bq)

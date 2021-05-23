@@ -65,7 +65,7 @@ class CAMSData(FData):
         self.cnbal = { pidcname[pid]:bo for pid,bo in pidbal.items() }
         self.cntxns = { pidcname[pid]:to for pid,to in pidtxns.items() }
 
-class Match:
+class SBMatch:
     eqtyp = {'Equity','Balanced','Index Fund'}
     @lru_cache(maxsize=1)
     def curnav(self): return self.balo.value/self.balo.units
@@ -92,7 +92,7 @@ class Match:
         self.iseq = self.balo.typ in self.eqtyp
         self.isfree = (datetime.today() - self.bt.txndt).days > 365*(1 if self.iseq else 3)
 
-class PFObj:
+class Fund:
     def _wildcard(self): return 0
     def value(self): return self.bo.value
     def cost(self): return self.bo.cost
@@ -105,13 +105,13 @@ class PFObj:
     def get(self,p): return getattr(self,p)()
     @lru_cache(maxsize=1)
     def cagr(self): return sum(mo.cagr()*mo.units for mo in self.bq)/self.bo.units
-    def handlebuy(self,t): self.bq = self.bq + [Match(t.units,t,self.bo)]
+    def handlebuy(self,t): self.bq = self.bq + [SBMatch(t.units,t,self.bo)]
     def _sbmatch(self,tgtu,matches,bq,st):
         bq0 = bq[0]
         bu,bt = bq0.units,bq0.bt
         return (matches,bq) if tgtu < 0.0001 else \
-            ( matches+[Match(tgtu,bt,self.bo,st)], [Match(bu-tgtu,bt,self.bo)]+bq[1:] ) if tgtu < bu else \
-            self._sbmatch(tgtu-bu,matches+[Match(bu,bt,self.bo,st)],bq[1:],st)
+            ( matches+[SBMatch(tgtu,bt,self.bo,st)], [SBMatch(bu-tgtu,bt,self.bo)]+bq[1:] ) if tgtu < bu else \
+            self._sbmatch(tgtu-bu,matches+[SBMatch(bu,bt,self.bo,st)],bq[1:],st)
     def handlesale(self,t):
         matches,rembq =  self._sbmatch(-t.units,[],self.bq,t)
         self.sbmatch = self.sbmatch + [(t,matches)]
@@ -127,10 +127,10 @@ class PFObj:
         self.vo = vd.cnvo.get(f,None)
         self.buildmatch(cd.cntxns[f])
 
-class PFData:
+class Portfolio:
     def by(self,p): return groupby(sorted(self.pfobjs,key=lambda o:str(o.get(p))),lambda o:o.get(p))
     def buymatches(self): return [ (mo,po) for po in self.pfobjs for mo in po.bq ]
     def __init__(self):
         cd = CAMSData()
         vd = VRMFData()
-        self.pfobjs = { PFObj(f,cd,vd) for f in cd.cnbal }
+        self.pfobjs = { Fund(f,cd,vd) for f in cd.cnbal }
