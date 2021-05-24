@@ -58,18 +58,19 @@ class PFViews(Portfolio):
             mo.bt.txndt.strftime('%y%m%d'), #5
             mo.units, #6
             mo.cost(), #7
-            mo.value(), #8
-            mo.gain(), #9
-            mo.pgain(), #10
-            mo.igain(), #11
-            mo.cagr(), #12
-            po.subcat(), #13
+            mo.icost(), #8
+            mo.value(), #9
+            mo.gain(), #10
+            mo.pgain(), #11
+            mo.igain(), #12
+            mo.cagr(), #13
+            po.subcat(), #14
             ]
             for po,st,mos in self.rg_sbmatches() for mo in mos ],
             title = 'REALIZED GAIN',
-            colnames = ['Typ','Free','Fund','SDate','BDate','Units','Cost','Value','Gain','%Gain','iGain','CAGR','Subcat'],
+            colnames = ['Typ','Free','Fund','SDate','BDate','Units','Cost','iCost','Value','Gain','%Gain','iGain','CAGR','Subcat'],
             sort = [-4,3],
-            formaters = {6:'%9.4f',7:'%8.0f',8:'%8.0f',9:'%8.0f',10:'%5.2f',11:'%8.0f',12:'%5.2f',13:'%-11s'},
+            formaters = {6:'%9.4f',7:'%8.0f',8:'%8.0f',9:'%8.0f',10:'%8.0f',11:'%5.2f',12:'%8.0f',13:'%5.2f',14:'%-11s'},
             file=fp
             )
         fp.close()
