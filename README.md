@@ -84,3 +84,11 @@ The output files will be produced in cwd as follows:
         - Realized gains report for sale transactions, fields are more or less
           similar to the unrealized gainst report above, except that sale date
           is added and fund's current performance related fields are dropped
+
+        - The fund type (equity/debt) is figured out from the holdings
+          statement if the fund is still held, else an attempt is made to map
+          the name to VR data to figure out type. The program tries to handle
+          some of the name variations when doing this search. However some fund
+          names vary just too exotically when the program gives up and puts a
+          '-' in fund type. Rest of the report data is still useful for such
+          fund names and one can figure out the type manually.

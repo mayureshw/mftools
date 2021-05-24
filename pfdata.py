@@ -95,7 +95,8 @@ class SBMatch:
         self.balo = balo
         self.f = f
         self.st = st
-        self.typ = ('EQ' if self.balo.typ in self.eqtyp else 'DT') if self.balo else '-'
+        self.typ = ('EQ' if self.balo.typ in self.eqtyp else 'DT') if self.balo else \
+            vd.typ(self.f) if self.balo or self.st else '-'
         self.isfree = '-' if self.typ == '-' else (
             (self.st.txndt if self.st else self.balo.navdt) - self.bt.txndt
             ).days > 365*(1 if self.typ=='EQ' else 3)
