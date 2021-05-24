@@ -32,6 +32,10 @@ class VRMFData(FData):
     noise = [ r'-' ]
     spacepats = [ r' +' ]
     def get(self,cnm,p): return self.cnvo[cnm].__dict__[p] if cnm in self.cnvo else None
+    def typ(self,cname):
+        if cname not in self.cnvo: return '-'
+        cat,subcat = self.cnvo[cname].cat.split('-')
+        return cat if cat in {'EQ','DT'} else 'EQ' if subcat=='AH' else 'DT'
     def __init__(self):
         csvfiles = list(mfdocsdir.glob('all-*-funds-*.csv'))
         if len(csvfiles) != 3:
@@ -39,6 +43,7 @@ class VRMFData(FData):
             sys.exit(1)
         objs = [ o for csv in csvfiles for o in XlsObjs(csv,specname='vrmf') ]
         self.cnvo = { self.cname(o.fname) : o for o in objs }
+vd = VRMFData()
 
 class CAMSData(FData):
     prodre = re.compile('\(\w+\)')
@@ -84,10 +89,11 @@ class SBMatch:
         bnav = self.tnav(self.bt)
         hldyrs = self.holdyrs(self.bt,self.st.txndt if self.st else self.balo.navdt)
         return 100*( pow(snav/bnav,1/hldyrs) - 1 ) if bnav and hldyrs else 0
-    def __init__(self,units,bt,balo,st=None):
+    def __init__(self,units,bt,balo,f,st=None):
         self.units = units
         self.bt = bt
         self.balo = balo
+        self.f = f
         self.st = st
         self.typ = ('EQ' if self.balo.typ in self.eqtyp else 'DT') if self.balo else '-'
         self.isfree = '-' if self.typ == '-' else (
@@ -107,7 +113,7 @@ class Fund:
     def get(self,p): return getattr(self,p)()
     @lru_cache(maxsize=1)
     def cagr(self): return sum(mo.cagr()*mo.units for mo in self.bq)/self.bo.units
-    def handlebuy(self,t): self.bq = self.bq + [SBMatch(t.units,t,self.bo)]
+    def handlebuy(self,t): self.bq = self.bq + [SBMatch(t.units,t,self.bo,self.f)]
     def _sbmatch(self,tgtu,matches,bq,st):
         if tgtu < 0.0001: return matches,bq
         if bq==[]:
@@ -115,8 +121,9 @@ class Fund:
             return [],[]
         bq0 = bq[0]
         bu,bt = bq0.units,bq0.bt
-        return ( matches+[SBMatch(tgtu,bt,self.bo,st)], [SBMatch(bu-tgtu,bt,self.bo)]+bq[1:] ) if tgtu < bu else \
-            self._sbmatch(tgtu-bu,matches+[SBMatch(bu,bt,self.bo,st)],bq[1:],st)
+        return (matches+[SBMatch(tgtu,bt,self.bo,self.f,st)],
+            [SBMatch(bu-tgtu,bt,self.bo,self.f,st)]+bq[1:]) if tgtu < bu else \
+            self._sbmatch(tgtu-bu,matches+[SBMatch(bu,bt,self.bo,self.f,st)],bq[1:],st)
     def handlesale(self,t):
         matches,rembq =  self._sbmatch(-t.units,[],self.bq,t)
         self.sbmatch = self.sbmatch + [(t,matches)]
@@ -125,7 +132,7 @@ class Fund:
         self.bq = []
         self.sbmatch = []
         [ self.handlebuy(t) if t.units > 0 else self.handlesale(t) for t in txns if t.units ]
-    def __init__(self,f,cd,vd):
+    def __init__(self,f,cd):
         self.f = f
         self.bo = cd.cnbal.get(f,None)
         self._amc = cd.cntxns[f][0].amc
@@ -139,6 +146,5 @@ class Portfolio:
         for (st,mos) in po.sbmatch ]
     def __init__(self):
         cd = CAMSData()
-        vd = VRMFData()
-        self.holdings = [ Fund(f,cd,vd) for f in cd.cnbal ]
-        self.nonholdings = [ Fund(f,cd,vd) for f in cd.cntxns if f not in cd.cnbal ]
+        self.holdings = [ Fund(f,cd) for f in cd.cnbal ]
+        self.nonholdings = [ Fund(f,cd) for f in cd.cntxns if f not in cd.cnbal ]
