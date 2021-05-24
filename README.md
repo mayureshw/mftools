@@ -78,3 +78,9 @@ The output files will be produced in cwd as follows:
         - Typ: EQ or DT from taxation point of view, Free: True if Buy txn held
           for more than 365 days for type EQ and 365*3 days for type DT. Rest
           of the fields are more or less similar to pfreport.
+
+    rgainreport.txt:
+
+        - Realized gains report for sale transactions, fields are more or less
+          similar to the unrealized gainst report above, except that sale date
+          is added and fund's current performance related fields are dropped
