@@ -51,7 +51,9 @@ class VRMFData(FData):
         objs = [ o for csv in csvfiles for o in XlsObjs(csv,specname='vrmf') ]
         self.cnvo = { self.cname(o.fname) : o for o in objs }
 vd = VRMFData()
-cii = json.load(mfdocsdir.joinpath('cii.json').open())
+cii = json.load(ciifile.open()) if ciifile.exists() else {}
+gfnav = json.load(gfgfile.open()) if gfgfile.exists() else {}
+gfdate = datetime(2018,1,31)
 
 class CAMSData(FData):
     prodre = re.compile('\(\w+\)')
@@ -103,6 +105,12 @@ class SBMatch:
     def igain(self):
         icost = self.icost()
         return icost if icost== '-' else self.value() - icost
+    @lru_cache(maxsize=1)
+    def gfgain(self):
+        if self.f not in gfnav: return self.gain()
+        sdate = self.st.txndt if self.st else self.balo.navdt
+        return self.value() - gfnav[self.f]*self.units if \
+            sdate > gfdate and self.bt.txndt < gfdate else self.gain()
     @lru_cache(maxsize=1)
     def value(self): return (self.st.amt*self.units/self.st.units) if self.st else \
         self.balo.value*self.units/self.balo.units

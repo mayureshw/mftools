@@ -33,18 +33,19 @@ class PFViews(Portfolio):
             mo.gain(), #9
             mo.pgain(), #10
             mo.igain(), #11
-            mo.cagr(), #12
-            str(po.rating()), #13
-            po.oyret(), #14
-            po.subcat(), #15
+            mo.gfgain(), #12
+            mo.cagr(), #13
+            str(po.rating()), #14
+            po.oyret(), #15
+            po.subcat(), #16
             ]
             for po,mo in self.urg_sbmatches()],
             title = 'UNREALIZED GAIN',
-            colnames = ['Typ','Free','Fund','Date','Units','Cost','iCost','Value','Gain','%Gain', 'iGain',
+            colnames = ['Typ','Free','Fund','Date','Units','Cost','iCost','Value','Gain','%Gain', 'iGain','gGain',
                 'CAGR','Rat','1YRet','Subcat'],
-            sort = [-1,-2,12,3],
-            formaters = {5:'%9.4f',6:'%8.0f',7:'%8.0f',8:'%8.0f',9:'%8.0f',10:'%5.2f',11:'%8.0f',12:'%5.2f',
-                14:'%5.2f',15:'%-11s'},
+            sort = [-1,-2,14,3],
+            formaters = {5:'%9.4f',6:'%8.0f',7:'%8.0f',8:'%8.0f',9:'%8.0f',10:'%5.2f',11:'%8.0f',12:'%8.0f',
+                13:'%5.2f',15:'%5.2f',16:'%-11s'},
             file=fp
             )
         fp.close()

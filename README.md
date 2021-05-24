@@ -52,10 +52,36 @@ Rename the file with name CurrentValuation*.xls as bals.xls.
 
 ## Getting Cost Inflation Index
 
+You can skip this section if you are not interested in CII adjusted gain. You
+should usually be interested if you have sold or plan to sale debt fund
+holdings held for more than 3 years.
+
 CII information is picked from incometax website
 https://www.incometaxindia.gov.in/charts%20%20tables/cost-inflation-index.htm A
 file named cii.json is packaged with the source. Please copy it to $MFDOCSDIR.
 If it is out of date feel free to add or correct approriate entries.
+
+In case if $MFDOCSDIR/cii.json is not found or it does not have index data of
+either the buy or sale year the indexed cost / gain will be reported as '-'
+
+## Getting grandfathered gain
+
+You can skip this section if you are not interested in grandfathered gain
+computation. You may be interested in this if you had equity fund holdings as
+on 31 Jan 2018 that you plan to sale or have sold.
+
+Though a bit effort intensive, this activity is required only once. Download
+the grandfathered gain statement from your registrar's website and provide the
+information in $PFDATDIR/gf.json in the following form:
+
+    {
+        <fund name in double quotes> : <NAV without quotes>
+        ... (you can make multiple comma separated entries. Avoid comma after
+             the last entry.)
+    }
+
+    Make sure that the fund name is as per the generated reports. It may be
+    spelt slightly different from the name in the statement.
 
 ## Generating reports
 
@@ -122,8 +148,6 @@ The output files will be produced in cwd as follows:
           declared by the Govt and added to cii.json
 
 # Wish list
-
-- Grandfathered gain computation
 
 - Relating gains to FY, computing totals for FY and for the split periods
   required for tax filing purpose
