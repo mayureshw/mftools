@@ -6,6 +6,13 @@ from functools import lru_cache
 from datetime import datetime
 import sys
 import re
+import json
+
+def dt2fy(dt):
+    y = dt.year
+    fmt1 = '%4d'
+    fmt2 = '%02d'
+    return fmt1%y+'-'+fmt2%((y+1)%100) if dt.month > 3 else fmt1%(y-1)+'-'+fmt2%(y%100)
 
 # TODO: Probably we want to merge noise and spacepats into adhocpats and call it something else
 class FData():
@@ -44,6 +51,7 @@ class VRMFData(FData):
         objs = [ o for csv in csvfiles for o in XlsObjs(csv,specname='vrmf') ]
         self.cnvo = { self.cname(o.fname) : o for o in objs }
 vd = VRMFData()
+cii = json.load(mfdocsdir.joinpath('cii.json').open())
 
 class CAMSData(FData):
     prodre = re.compile('\(\w+\)')
@@ -80,6 +88,21 @@ class SBMatch:
     def holdyrs(self,t,sdt): return (sdt-t.txndt).days/365
     @lru_cache(maxsize=1)
     def cost(self): return self.bt.amt*self.units/self.bt.units
+    @lru_cache(maxsize=1)
+    def icost(self):
+        bfy = dt2fy(self.bt.txndt)
+        if bfy not in cii: return '-'
+        sfy = dt2fy(self.st.txndt if self.st else self.balo.navdt)
+        if sfy not in cii: return '-'
+        return self.cost()*cii[sfy]/cii[bfy]
+    @lru_cache(maxsize=1)
+    def gain(self): return self.value() - self.cost()
+    @lru_cache(maxsize=1)
+    def pgain(self): return self.gain()*100/self.cost() if self.cost() else '-'
+    @lru_cache(maxsize=1)
+    def igain(self):
+        icost = self.icost()
+        return icost if icost== '-' else self.value() - icost
     @lru_cache(maxsize=1)
     def value(self): return (self.st.amt*self.units/self.st.units) if self.st else \
         self.balo.value*self.units/self.balo.units

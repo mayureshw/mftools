@@ -28,21 +28,22 @@ class PFViews(Portfolio):
             mo.bt.txndt.strftime('%y%m%d'), #4
             mo.units, #5
             mo.cost(), #6
-            mo.value(), #7
-            mo.value() - mo.cost(), #8
-            ((mo.value()-mo.cost())*100/mo.cost()) if mo.cost() else '-', #9
-            mo.cagr(), #10
-            str(po.rating()), #11
-            po.oyret(), #12
-            po.subcat(), #13
+            mo.icost(), #7
+            mo.value(), #8
+            mo.gain(), #9
+            mo.pgain(), #10
+            mo.cagr(), #11
+            str(po.rating()), #12
+            po.oyret(), #13
+            po.subcat(), #14
             ]
             for po,mo in self.urg_sbmatches()],
             title = 'UNREALIZED GAIN',
-            colnames = ['Typ','Free','Fund','Date','Units','Cost','Value','Gain','%Gain','CAGR','Rat',
-                '1YRet','Subcat'],
-            sort = [-1,-2,11,3],
-            formaters = {5:'%9.4f',6:'%8.0f',7:'%8.0f',8:'%8.0f',9:'%5.2f',10:'%5.2f',12:'%5.2f',
-                13:'%-11s'},
+            colnames = ['Typ','Free','Fund','Date','Units','Cost','iCost','Value','Gain','%Gain',
+                'CAGR','Rat','1YRet','Subcat'],
+            sort = [-1,-2,12,3],
+            formaters = {5:'%9.4f',6:'%8.0f',7:'%8.0f',8:'%8.0f',9:'%8.0f',10:'%5.2f',11:'%5.2f',
+                13:'%5.2f',14:'%-11s'},
             file=fp
             )
         fp.close()
@@ -57,8 +58,8 @@ class PFViews(Portfolio):
             mo.units, #6
             mo.cost(), #7
             mo.value(), #8
-            mo.value() - mo.cost(), #9
-            ((mo.value()-mo.cost())*100/mo.cost()) if mo.cost() else '-', #10
+            mo.gain(), #9
+            mo.pgain(), #10
             mo.cagr(), #11
             po.subcat(), #12
             ]

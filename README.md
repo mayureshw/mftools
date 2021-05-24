@@ -50,6 +50,13 @@ Rename the file with name AS*.xls as txns.xls
 
 Rename the file with name CurrentValuation*.xls as bals.xls.
 
+## Getting Cost Inflation Index
+
+CII information is picked from incometax website
+https://www.incometaxindia.gov.in/charts%20%20tables/cost-inflation-index.htm A
+file named cii.json is packaged with the source. Please copy it to $MFDOCSDIR.
+If it is out of date feel free to add or correct approriate entries.
+
 ## Generating reports
 
 Do check that the environment variables section and ensure that all files are
@@ -104,11 +111,13 @@ The output files will be produced in cwd as follows:
           are interested in it being processed, you will need to get the
           statement start date covering the purchase dates
 
+        - Indexed gain is computed for all funds for information, though for
+          taxation purpose it is relevant for DT funds with hold period > 3
+          years (columns Typ and Free should be DT and True)
+
 # Wish list
 
 - Grandfathered gain computation
 
 - Relating gains to FY, computing totals for FY and for the split periods
   required for tax filing purpose
-
-- Use of CII to compute indexed gain
