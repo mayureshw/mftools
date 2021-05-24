@@ -110,7 +110,7 @@ class Fund:
     def amc(self): return self._amc
     def cat(self): return self.vo.cat.split('-')[0] if self.vo else '-'
     def subcat(self): return self.vo.cat if self.vo else '-'
-    def shortf(self): return self.f[:30]
+    def shortf(self): return self.f[:30].strip()
     def get(self,p): return getattr(self,p)()
     @lru_cache(maxsize=1)
     def cagr(self): return sum(mo.cagr()*mo.units for mo in self.bq)/self.bo.units
