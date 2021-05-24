@@ -73,7 +73,8 @@ The output files will be produced in cwd as follows:
     pfgainreports.txt:
 
         - Unrealized gain for each Buy transaction as of NAV date in the
-          statement.
+          statement. One of the uses of this report is to identify funds you
+          may want to sell.
 
         - Typ: EQ or DT from taxation point of view, Free: True if Buy txn held
           for more than 365 days for type EQ and 365*3 days for type DT. Rest
@@ -84,6 +85,9 @@ The output files will be produced in cwd as follows:
         - Realized gains report for sale transactions, fields are more or less
           similar to the unrealized gainst report above, except that sale date
           is added and fund's current performance related fields are dropped
+
+        - The report may be useful for tax computation purpose. The registrars
+          also provide this report. You may like to just use this for tallying.
 
         - The fund type (equity/debt) is figured out from the holdings
           statement if the fund is still held, else an attempt is made to map
