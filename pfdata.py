@@ -109,10 +109,13 @@ class Fund:
     def cagr(self): return sum(mo.cagr()*mo.units for mo in self.bq)/self.bo.units
     def handlebuy(self,t): self.bq = self.bq + [SBMatch(t.units,t,self.bo)]
     def _sbmatch(self,tgtu,matches,bq,st):
+        if tgtu < 0.0001: return matches,bq
+        if bq==[]:
+            print('Warning: buy transactions not found',st.txndt.strftime('%y%m%d'),st.fname)
+            return [],[]
         bq0 = bq[0]
         bu,bt = bq0.units,bq0.bt
-        return (matches,bq) if tgtu < 0.0001 else \
-            ( matches+[SBMatch(tgtu,bt,self.bo,st)], [SBMatch(bu-tgtu,bt,self.bo)]+bq[1:] ) if tgtu < bu else \
+        return ( matches+[SBMatch(tgtu,bt,self.bo,st)], [SBMatch(bu-tgtu,bt,self.bo)]+bq[1:] ) if tgtu < bu else \
             self._sbmatch(tgtu-bu,matches+[SBMatch(bu,bt,self.bo,st)],bq[1:],st)
     def handlesale(self,t):
         matches,rembq =  self._sbmatch(-t.units,[],self.bq,t)
@@ -124,7 +127,7 @@ class Fund:
         [ self.handlebuy(t) if t.units > 0 else self.handlesale(t) for t in txns if t.units ]
     def __init__(self,f,cd,vd):
         self.f = f
-        self.bo = cd.cnbal[f]
+        self.bo = cd.cnbal.get(f,None)
         self._amc = cd.cntxns[f][0].amc
         self.vo = vd.cnvo.get(f,None)
         self.buildmatch(cd.cntxns[f])
@@ -132,8 +135,10 @@ class Fund:
 class Portfolio:
     def by(self,p): return groupby(sorted(self.holdings,key=lambda o:str(o.get(p))),lambda o:o.get(p))
     def urg_sbmatches(self): return [ (po,mo) for po in self.holdings for mo in po.bq ]
-    def rg_sbmatches(self): return [ (po,st,mos) for po in self.holdings for (st,mos) in po.sbmatch ]
+    def rg_sbmatches(self): return [ (po,st,mos) for po in (self.holdings+self.nonholdings)
+        for (st,mos) in po.sbmatch ]
     def __init__(self):
         cd = CAMSData()
         vd = VRMFData()
-        self.holdings = { Fund(f,cd,vd) for f in cd.cnbal }
+        self.holdings = [ Fund(f,cd,vd) for f in cd.cnbal ]
+        self.nonholdings = [ Fund(f,cd,vd) for f in cd.cntxns if f not in cd.cnbal ]
