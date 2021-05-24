@@ -92,3 +92,10 @@ The output files will be produced in cwd as follows:
           names vary just too exotically when the program gives up and puts a
           '-' in fund type. Rest of the report data is still useful for such
           fund names and one can figure out the type manually.
+
+        - In case you gave a start date of transactions such that buy
+          transactions required for capital gain computation are lost, a
+          warning is printed for that fund with its sale date in yymmdd form.
+          If that is too old a transaction you might ignore the warning. If you
+          are interested in it being processed, you will need to get the
+          statement start date covering the purchase dates
