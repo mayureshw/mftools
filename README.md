@@ -77,7 +77,7 @@ The output files will be produced in cwd as follows:
         - AMC-wise, Category-wise, Subcategory-wise views with percentage share
           of each
 
-    pfgainreports.txt:
+    pfgainreport.txt:
 
         - Unrealized gain for each Buy transaction as of NAV date in the
           statement. One of the uses of this report is to identify funds you
@@ -111,9 +111,15 @@ The output files will be produced in cwd as follows:
           are interested in it being processed, you will need to get the
           statement start date covering the purchase dates
 
+    Indexed gain computation in both pfgainreport.txt and rgainreport.txt
+
         - Indexed gain is computed for all funds for information, though for
           taxation purpose it is relevant for DT funds with hold period > 3
           years (columns Typ and Free should be DT and True)
+
+        - For pfgainreport and for sale transactions in current FY, the indexed
+          cost/gain will be shown as '-' until the CII for the present year is
+          declared by the Govt and added to cii.json
 
 # Wish list
 

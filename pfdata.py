@@ -146,7 +146,7 @@ class Fund:
         bq0 = bq[0]
         bu,bt = bq0.units,bq0.bt
         return (matches+[SBMatch(tgtu,bt,self.bo,self.f,st)],
-            [SBMatch(bu-tgtu,bt,self.bo,self.f,st)]+bq[1:]) if tgtu < bu else \
+            [SBMatch(bu-tgtu,bt,self.bo,self.f)]+bq[1:]) if tgtu < bu else \
             self._sbmatch(tgtu-bu,matches+[SBMatch(bu,bt,self.bo,self.f,st)],bq[1:],st)
     def handlesale(self,t):
         matches,rembq =  self._sbmatch(-t.units,[],self.bq,t)
