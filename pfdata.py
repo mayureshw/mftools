@@ -83,14 +83,15 @@ class SBMatch:
         snav = self.tnav(self.st) if self.st else self.curnav()
         bnav = self.tnav(self.bt)
         hldyrs = self.holdyrs(self.bt,self.st.txndt if self.st else self.balo.navdt)
-        return 100*( pow(self.curnav()/bnav,1/hldyrs) - 1 ) if bnav and hldyrs else 0
+        return 100*( pow(snav/bnav,1/hldyrs) - 1 ) if bnav and hldyrs else 0
     def __init__(self,units,bt,balo,st=None):
         self.units = units
         self.bt = bt
         self.balo = balo
         self.st = st
         self.iseq = self.balo.typ in self.eqtyp
-        self.isfree = (datetime.today() - self.bt.txndt).days > 365*(1 if self.iseq else 3)
+        self.isfree = ((self.st.txndt if self.st else self.balo.navdt) - self.bt.txndt).days > 365*(
+            1 if self.iseq else 3)
 
 class Fund:
     def _wildcard(self): return 0

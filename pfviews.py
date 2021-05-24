@@ -46,7 +46,30 @@ class PFViews(Portfolio):
             file=fp
             )
         fp.close()
-    def rgainreport(self): pass
+    def rgainreport(self):
+        fp = open('rgainreport.txt','w')
+        printTbl([[
+            'EQ' if mo.iseq else 'DT', #1
+            mo.isfree, #2
+            po.shortf(), #3
+            st.txndt.strftime('%y%m%d'), #4
+            mo.bt.txndt.strftime('%y%m%d'), #5
+            mo.units, #6
+            mo.cost(), #7
+            mo.value(), #8
+            mo.value() - mo.cost(), #9
+            ((mo.value()-mo.cost())*100/mo.cost()) if mo.cost() else '-', #10
+            mo.cagr(), #11
+            po.subcat(), #12
+            ]
+            for po,st,mos in self.rg_sbmatches() for mo in mos ],
+            title = 'PFGAIN',
+            colnames = ['Typ','Free','Fund','SDate','BDate','Units','Cost','Value','Gain','%Gain','CAGR','Subcat'],
+            sort = [-4,3],
+            formaters = {6:'%9.4f',7:'%8.0f',8:'%8.0f',9:'%8.0f',10:'%5.2f',11:'%5.2f',12:'%-11s'},
+            file=fp
+            )
+        fp.close()
     def pfreport(self):
         fp = open('pfreport.txt','w')
         pname = {'amc':'AMC','rating':'RATING','cat':'CATEGORY','subcat':'SUBCATEGORY'}
