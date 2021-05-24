@@ -61,14 +61,15 @@ class PFViews(Portfolio):
             mo.value(), #8
             mo.gain(), #9
             mo.pgain(), #10
-            mo.cagr(), #11
-            po.subcat(), #12
+            mo.igain(), #11
+            mo.cagr(), #12
+            po.subcat(), #13
             ]
             for po,st,mos in self.rg_sbmatches() for mo in mos ],
             title = 'REALIZED GAIN',
-            colnames = ['Typ','Free','Fund','SDate','BDate','Units','Cost','Value','Gain','%Gain','CAGR','Subcat'],
+            colnames = ['Typ','Free','Fund','SDate','BDate','Units','Cost','Value','Gain','%Gain','iGain','CAGR','Subcat'],
             sort = [-4,3],
-            formaters = {6:'%9.4f',7:'%8.0f',8:'%8.0f',9:'%8.0f',10:'%5.2f',11:'%5.2f',12:'%-11s'},
+            formaters = {6:'%9.4f',7:'%8.0f',8:'%8.0f',9:'%8.0f',10:'%5.2f',11:'%8.0f',12:'%5.2f',13:'%-11s'},
             file=fp
             )
         fp.close()
