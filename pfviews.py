@@ -22,7 +22,7 @@ class PFViews(Portfolio):
     def pfgainreport(self):
         fp = open('pfgainreport.txt','w')
         printTbl([[
-            'EQ' if mo.iseq else 'DT', #1
+            mo.typ, #1
             mo.isfree, #2
             po.shortf(), #3
             mo.bt.txndt.strftime('%y%m%d'), #4
@@ -49,7 +49,7 @@ class PFViews(Portfolio):
     def rgainreport(self):
         fp = open('rgainreport.txt','w')
         printTbl([[
-            'EQ' if mo.iseq else 'DT', #1
+            mo.typ, #1
             mo.isfree, #2
             po.shortf(), #3
             st.txndt.strftime('%y%m%d'), #4

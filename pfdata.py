@@ -89,9 +89,10 @@ class SBMatch:
         self.bt = bt
         self.balo = balo
         self.st = st
-        self.iseq = self.balo.typ in self.eqtyp
-        self.isfree = ((self.st.txndt if self.st else self.balo.navdt) - self.bt.txndt).days > 365*(
-            1 if self.iseq else 3)
+        self.typ = ('EQ' if self.balo.typ in self.eqtyp else 'DT') if self.balo else '-'
+        self.isfree = '-' if self.typ == '-' else (
+            (self.st.txndt if self.st else self.balo.navdt) - self.bt.txndt
+            ).days > 365*(1 if self.typ=='EQ' else 3)
 
 class Fund:
     def _wildcard(self): return 0
