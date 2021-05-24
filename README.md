@@ -103,3 +103,12 @@ The output files will be produced in cwd as follows:
           If that is too old a transaction you might ignore the warning. If you
           are interested in it being processed, you will need to get the
           statement start date covering the purchase dates
+
+# Wish list
+
+- Grandfathered gain computation
+
+- Relating gains to FY, computing totals for FY and for the split periods
+  required for tax filing purpose
+
+- Use of CII to compute indexed gain
