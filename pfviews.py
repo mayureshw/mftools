@@ -37,7 +37,7 @@ class PFViews(Portfolio):
             po.subcat(), #13
             ]
             for po,mo in self.urg_sbmatches()],
-            title = 'PFGAIN',
+            title = 'UNREALIZED GAIN',
             colnames = ['Typ','Free','Fund','Date','Units','Cost','Value','Gain','%Gain','CAGR','Rat',
                 '1YRet','Subcat'],
             sort = [-1,-2,11,3],
@@ -63,7 +63,7 @@ class PFViews(Portfolio):
             po.subcat(), #12
             ]
             for po,st,mos in self.rg_sbmatches() for mo in mos ],
-            title = 'PFGAIN',
+            title = 'REALIZED GAIN',
             colnames = ['Typ','Free','Fund','SDate','BDate','Units','Cost','Value','Gain','%Gain','CAGR','Subcat'],
             sort = [-4,3],
             formaters = {6:'%9.4f',7:'%8.0f',8:'%8.0f',9:'%8.0f',10:'%5.2f',11:'%5.2f',12:'%-11s'},
