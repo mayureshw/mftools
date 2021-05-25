@@ -124,7 +124,11 @@ class SBMatch:
         if gfapplies and not gfavailable and not reported:
             print('Entry needed in gfnav.json',self.f)
             SBMatch.needgfnav.add(self.f)
-        return (self.value() - gfnav[self.f]*self.units) if gfavailable and gfapplies else self.gain()
+        # https://economictimes.indiatimes.com/wealth/tax/how-to-calculate-tax-on-ltcg-from-equity-shares-and-equity-mutual-funds/articleshow/70581749.cms
+        return ( self.value() - max(
+            self.bt.amt*self.units/self.bt.units,
+            min( self.value(), gfnav[self.f]*self.units,)
+            ) ) if gfavailable and gfapplies else self.gain()
     @lru_cache(maxsize=1)
     def value(self): return (self.st.amt*self.units/self.st.units) if self.st else \
         self.balo.value*self.units/self.balo.units
