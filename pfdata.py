@@ -52,8 +52,6 @@ class VRMFData(FData):
         self.cnvo = { self.cname(o.fname) : o for o in objs }
 vd = VRMFData()
 cii = json.load(ciifile.open()) if ciifile.exists() else {}
-gfnav = json.load(gfgfile.open()) if gfgfile.exists() else {}
-gfdate = datetime(2018,1,31)
 
 class CAMSData(FData):
     prodre = re.compile('\(\w+\)')
@@ -80,8 +78,20 @@ class CAMSData(FData):
         self.cnbal = { pidcname[pid]:bo for pid,bo in pidbal.items() }
         self.cntxns = { pidcname[pid]:to for pid,to in pidtxns.items() }
 
+class GFNAV(dict,FData):
+    gfdate = datetime(2018,1,31)
+    noise = CAMSData.noise
+    spacepats = CAMSData.spacepats
+    def __init__(self):
+        gfnav = json.load(gfgfile.open()) if gfgfile.exists() else {}
+        cngfnav = { self.cname(f):n for f,n in gfnav.items() }
+        self.update(cngfnav)
+
+gfnav = GFNAV()
+
 class SBMatch:
     eqtyp = {'Equity','Balanced','Index Fund'}
+    needgfnav = set()
     @lru_cache(maxsize=1)
     def curnav(self): return self.balo.value/self.balo.units
     @lru_cache(maxsize=1)
@@ -107,10 +117,14 @@ class SBMatch:
         return icost if icost== '-' else self.value() - icost
     @lru_cache(maxsize=1)
     def gfgain(self):
-        if self.f not in gfnav: return self.gain()
         sdate = self.st.txndt if self.st else self.balo.navdt
-        return self.value() - gfnav[self.f]*self.units if \
-            sdate > gfdate and self.bt.txndt < gfdate else self.gain()
+        gfapplies = self.typ == 'EQ' and sdate > gfnav.gfdate and self.bt.txndt < gfnav.gfdate
+        gfavailable = self.f in gfnav
+        reported = self.f in SBMatch.needgfnav
+        if gfapplies and not gfavailable and not reported:
+            print('Entry needed in gfnav.json',self.f)
+            SBMatch.needgfnav.add(self.f)
+        return (self.value() - gfnav[self.f]*self.units) if gfavailable else self.gain()
     @lru_cache(maxsize=1)
     def value(self): return (self.st.amt*self.units/self.st.units) if self.st else \
         self.balo.value*self.units/self.balo.units
