@@ -124,7 +124,7 @@ class SBMatch:
         if gfapplies and not gfavailable and not reported:
             print('Entry needed in gfnav.json',self.f)
             SBMatch.needgfnav.add(self.f)
-        return (self.value() - gfnav[self.f]*self.units) if gfavailable else self.gain()
+        return (self.value() - gfnav[self.f]*self.units) if gfavailable and gfapplies else self.gain()
     @lru_cache(maxsize=1)
     def value(self): return (self.st.amt*self.units/self.st.units) if self.st else \
         self.balo.value*self.units/self.balo.units
