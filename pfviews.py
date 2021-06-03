@@ -108,8 +108,19 @@ class PFViews(Portfolio):
             ) for p in ['amc','rating','cat','subcat'] ]
         fp.close()
 
+    def cashflowreport(self):
+        fp = open('cashflowreport.txt','w')
+        printTbl( self.cashflow(),
+            title = 'FY wise total by transaction type',
+            colnames = ['FY','Type','Amount'],
+            formaters = {3:'%8.0f'},
+            file=fp
+            )
+        fp.close()
+
 if __name__ == '__main__':
     pfv = PFViews()
     pfv.pfreport()
     pfv.pfgainreport()
     pfv.rgainreport()
+    pfv.cashflowreport()

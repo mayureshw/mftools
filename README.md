@@ -152,6 +152,13 @@ The output files will be produced in cwd as follows:
           cost/gain will be shown as '-' until the CII for the present year is
           declared by the Govt and added to cii.json
 
+    cashflowreport.txt
+
+        - By financial year, by transaction type, total amount is reported
+
+        - The report is useful to tally cash flow between your bank account and
+          mutual funds, or tallying switch-in and switch-out totals
+
 # Wish list
 
 - Relating gains to FY, computing totals for FY and for the split periods
