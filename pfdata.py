@@ -42,7 +42,13 @@ class FData():
         ('Blue Chip','Bluechip'),
         ('P/E','PE'),
         ])
+    ttypcanner = Canizer([
+        ([r'-', r' +'],' '),
+        ([r'\(.*\)'],''),
+        ('^.*Purchase.*$','Purchase'),
+        ])
     def cname(self,fname): return self.fncaner.xform(fname)
+    def ctxntyp(self,s): return self.ttypcanner.xform(s)
 
 class VRMFData(FData):
     def get(self,cnm,p): return self.cnvo[cnm].__dict__[p] if cnm in self.cnvo else None
@@ -63,16 +69,9 @@ cii = json.load(ciifile.open()) if ciifile.exists() else {}
 
 class CAMSData(FData):
     prodre = re.compile('\(\w+\)')
-    #txntypnoise = [
-    #    r'\(\w+\)',
-    #    ]
-    #txntypcan = [
-    #    ('Purchases','Purchase'),
-    #    ]
     
-    def cantxntyp(self,s): return s.strip()
     def cashflow(self):
-        yta = sorted( [ (dt2fy(t.txndt), self.cantxntyp(t.txntyp),t.amt)
+        yta = sorted( [ (dt2fy(t.txndt), self.ctxntyp(t.txntyp),t.amt)
             for f in self.cntxns.values() for t in f if t.amt ],
             reverse = True
             )
