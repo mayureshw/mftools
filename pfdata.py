@@ -14,30 +14,37 @@ def dt2fy(dt):
     fmt2 = '%02d'
     return fmt1%y+'-'+fmt2%((y+1)%100) if dt.month > 3 else fmt1%(y-1)+'-'+fmt2%(y%100)
 
-# TODO: Probably we want to merge noise and spacepats into adhocpats and call it something else
+# Cannonicalizer Constructor accepts a list of tuples of form
+# (pattern,replacement) or (patternlist,replacement). Operations are applied in
+# the same sequence as in the list and an extra strip is applied in the end
+class Canizer:
+    def xform(self,s): return reduce(lambda s,pr: re.sub(*pr,s),self.spec,s).strip()
+    def __init__(self,spec): self.spec = [ (re.compile(p),r) for p1,r in spec for p in (
+            p1 if isinstance(p1,list) else [p1]) ]
+
 class FData():
-    noise = []
-    spacepats = []
-    adhocpats = [
-        ('Mid Cap','Midcap'),
-        ('MidCap','Midcap'),
+    fncaner = Canizer([
+        ([
+        r'\bGrowth Option\b',
+        r'\bGrowth\b',
+        r'\(\w+\)',
+        r'\(Erstwhile.*$',
+        r'\([Ff]ormerly.*$',
+        r'\(Earlier.*$',
+        r'[)(]',
+        ],''),
+
+        ( [r'-', r' +'], ' ' ),
+
+        (['Mid Cap','MidCap'],'Midcap'),
         ('Direct Plan','Direct'),
         ('Regular Plan','Regular'),
         ('Blue Chip','Bluechip'),
         ('P/E','PE'),
-        ]
-    def res(self,pats): return [ re.compile(p) for p in pats ]
-    def cname(self,fname): return reduce(
-        lambda s,srepl: re.sub(*srepl,s),[ (sre,repl) for sre,repl in (
-            [(n,'') for n in self.res(self.noise)] + \
-            [(s,' ') for s in self.res(self.spacepats)] + \
-            [(re.compile(sre),repl) for sre,repl in self.adhocpats]
-            )
-        ],fname).strip()
+        ])
+    def cname(self,fname): return self.fncaner.xform(fname)
 
 class VRMFData(FData):
-    noise = [ r'-' ]
-    spacepats = [ r' +' ]
     def get(self,cnm,p): return self.cnvo[cnm].__dict__[p] if cnm in self.cnvo else None
     def typ(self,cname):
         if cname not in self.cnvo: return '-'
@@ -50,22 +57,26 @@ class VRMFData(FData):
             sys.exit(1)
         objs = [ o for csv in csvfiles for o in XlsObjs(csv,specname='vrmf') ]
         self.cnvo = { self.cname(o.fname) : o for o in objs }
+
 vd = VRMFData()
 cii = json.load(ciifile.open()) if ciifile.exists() else {}
 
 class CAMSData(FData):
     prodre = re.compile('\(\w+\)')
-    noise = [
-        r'\bGrowth Option\b',
-        r'\bGrowth\b',
-        r'\(\w+\)',
-        r'\(Erstwhile.*$',
-        r'\([Ff]ormerly.*$',
-        r'\(Earlier.*$',
-        r'[)(]',
-        ]
-    spacepats = [ '-', r' +' ]
+    #txntypnoise = [
+    #    r'\(\w+\)',
+    #    ]
+    #txntypcan = [
+    #    ('Purchases','Purchase'),
+    #    ]
     
+    def cantxntyp(self,s): return s.strip()
+    def cashflow(self):
+        yta = sorted( [ (dt2fy(t.txndt), self.cantxntyp(t.txntyp),t.amt)
+            for f in self.cntxns.values() for t in f if t.amt ],
+            reverse = True
+            )
+        return [ (*yt,sum(t[2] for t in yta)) for yt,yta in groupby(yta,lambda to:to[0:2]) ]
     def prodid(self,fname): return self.prodre.search(fname).group()[1:-1]
     def __init__(self):
         balsfile = pfdatdir.joinpath('bals.xls')
@@ -80,8 +91,6 @@ class CAMSData(FData):
 
 class GFNAV(dict,FData):
     gfdate = datetime(2018,1,31)
-    noise = CAMSData.noise
-    spacepats = CAMSData.spacepats
     def __init__(self):
         gfnav = json.load(gfgfile.open()) if gfgfile.exists() else {}
         cngfnav = { self.cname(f):n for f,n in gfnav.items() }
@@ -194,7 +203,8 @@ class Portfolio:
     def urg_sbmatches(self): return [ (po,mo) for po in self.holdings for mo in po.bq ]
     def rg_sbmatches(self): return [ (po,st,mos) for po in (self.holdings+self.nonholdings)
         for (st,mos) in po.sbmatch ]
+    def cashflow(self): return self.cd.cashflow()
     def __init__(self):
-        cd = CAMSData()
-        self.holdings = [ Fund(f,cd) for f in cd.cnbal ]
-        self.nonholdings = [ Fund(f,cd) for f in cd.cntxns if f not in cd.cnbal ]
+        self.cd = CAMSData()
+        self.holdings = [ Fund(f,self.cd) for f in self.cd.cnbal ]
+        self.nonholdings = [ Fund(f,self.cd) for f in self.cd.cntxns if f not in self.cd.cnbal ]
