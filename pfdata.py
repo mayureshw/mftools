@@ -80,7 +80,7 @@ class CAMSData(FData):
     def __init__(self):
         balsfile = pfdatdir.joinpath('bals.xls')
         txnsfile = pfdatdir.joinpath('txns.xls')
-        bobjs = XlsObjs(balsfile,specname='camsbals')
+        bobjs = [ bo for bo in XlsObjs(balsfile,specname='camsbals') if bo.value ]
         pidbal = { self.prodid(bo.fname): bo for bo in bobjs }
         tobjs = XlsObjs(txnsfile,specname='camstxns')
         pidtxns = { pid:list(txns) for pid,txns in groupby(tobjs,lambda to:to.fid) }
