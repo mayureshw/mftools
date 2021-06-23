@@ -101,12 +101,12 @@ The output files will be produced in cwd as follows:
 
         - total portfolio value, cost and gain, %gain, CAGR
         
-        - fund-wise view sorted by Value Research sub-category with information
-          such as cost, value, gain, % gain, CAGR, % of your portfolio value,
-          Value Research Rating, 1 year Return, sub-category
+        - fund-wise view sorted by Value Research sub-category with fields:
+          cost, value, gain, % gain, CAGR, 1 year return, Value Research
+          Rating, % of your portfolio , sub-category
         
-        - AMC-wise, Category-wise, Subcategory-wise views with percentage share
-          of each
+        - AMC-wise, VR Rating-wise, Category-wise, Subcategory-wise views with
+          fields: cost, value, gain, %gain, CAGR, % of portfolio
 
     pfgainreport.txt:
 
@@ -114,9 +114,11 @@ The output files will be produced in cwd as follows:
           statement. One of the uses of this report is to identify funds you
           may want to sell.
 
-        - Typ: EQ or DT from taxation point of view, Free: True if Buy txn held
-          for more than 365 days for type EQ and 365*3 days for type DT. Rest
-          of the fields are more or less similar to pfreport.
+        - Fields: Typ: EQ or DT from taxation point of view, Free: True if Buy
+          txn held for more than 365 days for type EQ and 365*3 days for type
+          DT. Date: purchase date, Units, Cost, iCost: Indexed cost, Value,
+          Gain, %Gain, iGain: Indexed gain, gGain: Grandfathered gain, CAGR,
+          Rat: VR rating, 1 year return, subcategory
 
     rgainreport.txt:
 
@@ -161,5 +163,4 @@ The output files will be produced in cwd as follows:
 
 # Wish list
 
-- Relating gains to FY, computing totals for FY and for the split periods
-  required for tax filing purpose
+- Supporting more registrar statements
