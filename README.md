@@ -32,7 +32,7 @@ Produces simple text form reports described in Usage section.
 
 ## Getting fund data from value research and converting to csv:
 
-Got to Value Research website, fund selector and download the spread sheets for
+Go to Value Research website, fund selector and download the spread sheets for
 Equity, Debt and Hybrid funds.
 
 For unknown reasons, this xls file is not compatible with python xlrd package.
