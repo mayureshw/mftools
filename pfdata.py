@@ -55,7 +55,7 @@ class VRMFData(FData):
     def typ(self,cname):
         if cname not in self.cnvo: return '-'
         cat,subcat = self.cnvo[cname].cat.split('-')
-        return cat if cat in {'EQ','DT'} else 'EQ' if subcat in {'AH','AR'} else 'DT'
+        return cat if cat in {'EQ','DT'} else 'EQ' if subcat in {'AH','AR','DAA'} else 'DT'
     def __init__(self):
         csvfiles = list(mfdocsdir.glob('all-*-funds-*.csv'))
         if len(csvfiles) != 3:
