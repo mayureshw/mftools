@@ -68,7 +68,26 @@ vd = VRMFData()
 cii = json.load(ciifile.open()) if ciifile.exists() else {}
 
 class CAMSData(FData):
-    prodre = re.compile('\(\w+\)')
+    #prodre = re.compile('\(\w+\)')
+    # In May 2022 CMS broke the compatibility between product code in
+    # transaction sheet and scheme code in balances. Have reported the issue
+    # but usually futile to expect them to do something about it. Covering it
+    # up by prefixing hand written amc codes.
+
+    amccode = {
+        'Aditya Birla Sun Life Mutual Fund' : 'B',
+        'DSP Mutual Fund' : 'D',
+        'HDFC Mutual Fund' : 'H',
+        'ICICI Prudential Mutual Fund' : 'P',
+        'IDFC Mutual Fund' : 'G',
+        'IIFL Mutual Fund' : 'IF',
+        'Kotak Mutual Fund' : 'K',
+        'L&T Mutual Fund' : 'F',
+        'PPFAS Mutual Fund' : 'PP',
+        'SBI Mutual Fund' : 'L',
+        'Tata Mutual Fund' : 'T',
+        'Union Mutual Fund' : 'UK',
+        }
     
     def cashflow(self):
         yta = sorted( [ (dt2fy(t.txndt), self.ctxntyp(t.txntyp),t.amt)
@@ -76,12 +95,13 @@ class CAMSData(FData):
             reverse = True
             )
         return [ (*yt,sum(t[2] for t in yta)) for yt,yta in groupby(yta,lambda to:to[0:2]) ]
-    def prodid(self,fname): return self.prodre.search(fname).group()[1:-1]
+    #def prodid(self,fname): return self.prodre.search(fname).group()[1:-1]
+    def prodid(self,bo): return self.amccode[bo.amc] + bo.prodid
     def __init__(self):
         balsfile = pfdatdir.joinpath('bals.xls')
         txnsfile = pfdatdir.joinpath('txns.xls')
         bobjs = [ bo for bo in XlsObjs(balsfile,specname='camsbals') if bo.value ]
-        pidbal = { self.prodid(bo.fname): bo for bo in bobjs }
+        pidbal = { self.prodid(bo): bo for bo in bobjs }
         tobjs = XlsObjs(txnsfile,specname='camstxns')
         pidtxns = { pid:list(txns) for pid,txns in groupby(tobjs,lambda to:to.fid) }
         pidcname = { pid:self.cname(ts[0].fname) for pid,ts in pidtxns.items() }
