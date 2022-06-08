@@ -36,6 +36,7 @@ class FData():
         r'\bPl\b',
         r'\bPln\b',
         r'\bPlan\b',
+        r'Gr\.',
         r'\bGrowth Option\b',
         r'\bGrowth\b',
         r'\bGrow\b',
@@ -50,7 +51,7 @@ class FData():
 
         (['Mid Cap','MidCap'],'Midcap'),
         ('Small Cap','Smallcap'),
-        ([r'\bDP\b',r'\bDir\b',r'\bDIRECT\b',r'\bDG\b',r'\bDrt\b'],'Direct'),
+        ([r'\bDP\b',r'\bDir\b',r'\bDIRECT\b',r'\bDG\b',r'\bDrt\b',r'\bDIR\b'],'Direct'),
         ('Blue Chip','Bluechip'),
         (r'\bTreas\b','Treasury'),
         ([r'\bAdv\b',r'\bAd\b'],'Advantage'),
