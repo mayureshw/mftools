@@ -25,29 +25,57 @@ class Canizer:
 class FData():
     fncaner = Canizer([
         ([
-        r'\bGrowth Option\b',
-        r'\bGrowth\b',
         r'\(\w+\)',
-        r'\(Erstwhile.*$',
+        r'\([Ee]rstwhile.*$',
         r'\([Ff]ormerly.*$',
         r'\(Earlier.*$',
         r'[)(]',
+        r'\bFund\b',
+        r'\bFd\b',
+        r'\bF\b',
+        r'\bPl\b',
+        r'\bPln\b',
+        r'\bPlan\b',
+        r'\bGrowth Option\b',
+        r'\bGrowth\b',
+        r'\bGrow\b',
+        r'\bG\b',
+        r'\bGr\b',
+        r'\bGr\.\b',
+        r'\bGro\b',
+        r'\bGroOp\b',
         ],''),
 
         ( [r'-', r' +'], ' ' ),
 
         (['Mid Cap','MidCap'],'Midcap'),
-        ('Direct Plan','Direct'),
-        ('Regular Plan','Regular'),
+        ('Small Cap','Smallcap'),
+        ([r'\bDP\b',r'\bDir\b',r'\bDIRECT\b',r'\bDG\b',r'\bDrt\b'],'Direct'),
         ('Blue Chip','Bluechip'),
-        ('P/E','PE'),
+        (r'\bTreas\b','Treasury'),
+        ([r'\bAdv\b',r'\bAd\b'],'Advantage'),
+        (['P/E',r'\bPEF\b'],'PE'),
+        ([r'Eq\.',r'Equity\.',r'\bEq\b'],'Equity'),
+        ('ABSL','Aditya Birla Sun Life'),
+        (r'Equity&Debt','Equity & Debt'),
+        (r'SensexPlan','Sensex'),
+        (r'\bCF\b','Cash'),
+        (r'\bEF\b','Equity'),
+        (r'\bFEF\b','Focused Equity'),
+        (r'Val\.','Value'),
         ])
     ttypcanner = Canizer([
         ([r'-', r' +'],' '),
         ([r'\(.*\)'],''),
         ('^.*Purchase.*$','Purchase'),
         ])
-    def cname(self,fname): return self.fncaner.xform(fname)
+    # not all AMCs require prefixing
+    amcprefix = {
+        'DSP Mutual Fund' : 'DSP',
+        'ICICI Prudential Mutual Fund' : 'ICICI Prudential',
+        }
+
+    def cname(self,fname,amc=''): return ' '.join([ self.amcprefix.get(amc,''), self.fncaner.xform(fname) ]).strip()
     def ctxntyp(self,s): return self.ttypcanner.xform(s)
 
 class VRMFData(FData):
@@ -88,7 +116,7 @@ class CAMSData(FData):
         'Tata Mutual Fund' : 'T',
         'Union Mutual Fund' : 'UK',
         }
-    
+
     def cashflow(self):
         yta = sorted( [ (dt2fy(t.txndt), self.ctxntyp(t.txntyp),t.amt)
             for f in self.cntxns.values() for t in f if t.amt ],
@@ -104,7 +132,7 @@ class CAMSData(FData):
         pidbal = { self.prodid(bo): bo for bo in bobjs }
         tobjs = XlsObjs(txnsfile,specname='camstxns')
         pidtxns = { pid:list(txns) for pid,txns in groupby(tobjs,lambda to:to.fid) }
-        pidcname = { pid:self.cname(ts[0].fname) for pid,ts in pidtxns.items() }
+        pidcname = { pid:self.cname(ts[0].fname,ts[0].amc) for pid,ts in pidtxns.items() }
         self.cnbal = { pidcname[pid]:bo for pid,bo in pidbal.items() }
         self.cntxns = { pidcname[pid]:to for pid,to in pidtxns.items() }
 
