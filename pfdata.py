@@ -51,6 +51,7 @@ class FData():
 
         (['Mid Cap','MidCap'],'Midcap'),
         ('Small Cap','Smallcap'),
+        ('SENSEX','Sensex'),
         ([r'\bDP\b',r'\bDir\b',r'\bDIRECT\b',r'\bDG\b',r'\bDrt\b',r'\bDIR\b'],'Direct'),
         ('Blue Chip','Bluechip'),
         (r'\bTreas\b','Treasury'),
