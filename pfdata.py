@@ -191,10 +191,13 @@ class SBMatch:
         self.balo.value*self.units/self.balo.units
     @lru_cache(maxsize=1)
     def cagr(self):
+        if self.deemedHoldDays() <= 365: return '-'
         snav = self.tnav(self.st) if self.st else self.curnav()
         bnav = self.tnav(self.bt)
         hldyrs = self.holdyrs(self.bt,self.st.txndt if self.st else self.balo.navdt)
         return 100*( pow(snav/bnav,1/hldyrs) - 1 ) if bnav and hldyrs else 0
+    def deemedSaleDt(self): return self.st.txndt if self.st else self.balo.navdt
+    def deemedHoldDays(self): return ( self.deemedSaleDt() - self.bt.txndt ).days
     def __init__(self,units,bt,balo,f,st=None):
         self.units = units
         self.bt = bt
@@ -203,9 +206,8 @@ class SBMatch:
         self.st = st
         self.typ = ('EQ' if self.balo.typ in self.eqtyp else 'DT') if self.balo else \
             vd.typ(self.f) if self.balo or self.st else '-'
-        self.isfree = '-' if self.typ == '-' else (
-            (self.st.txndt if self.st else self.balo.navdt) - self.bt.txndt
-            ).days > 365*(1 if self.typ=='EQ' else 3)
+        self.isfree = '-' if self.typ == '-' else self.deemedHoldDays() > 365*(
+            1 if self.typ=='EQ' else 3)
 
 class Fund:
     def _wildcard(self): return 0
@@ -219,7 +221,16 @@ class Fund:
     def shortf(self): return self.f[:30].strip()
     def get(self,p): return getattr(self,p)()
     @lru_cache(maxsize=1)
-    def cagr(self): return sum(mo.cagr()*mo.units for mo in self.bq)/self.bo.units
+    def cagrCost(self): return sum(mo.cost() for mo in self.bq if mo.deemedHoldDays() > 365)
+    @lru_cache(maxsize=1)
+    def cagr(self):
+        wtcagr = 0
+        units = 0
+        for mo in self.bq:
+            if mo.deemedHoldDays() > 365:
+                wtcagr += mo.cagr()*mo.units
+                units += mo.units
+        return ( wtcagr / units ) if units > 0 else '-'
     def handlebuy(self,t): self.bq = self.bq + [SBMatch(t.units,t,self.bo,self.f)]
     def _sbmatch(self,tgtu,matches,bq,st):
         if tgtu < 0.0001: return matches,bq

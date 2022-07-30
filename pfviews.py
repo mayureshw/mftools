@@ -7,15 +7,17 @@ from functools import lru_cache
 class PFViews(Portfolio):
     @lru_cache(maxsize=1)
     def value(self): return sum(o.value() for o in self.holdings)
-    def _cagr(self,o): return sum(mo.cagr()*mo.cost() for mo in o.bq)
     def _aggr(self,os):
-        costs,values,cagrs = zip(*[ (o.cost(),o.value(),self._cagr(o)) for o in os ])
+        l_os = list(os)
+        costs,values = zip(*[ (o.cost(),o.value()) for o in l_os ])
         cost = sum(costs)
         value = sum(values)
         gain = value - cost
         pgain = gain*100/cost if cost else '-'
         pshare = value*100/self.value()
-        cagr = sum(cagrs)/cost if cost else '-'
+        wtcagr = sum( o.cagr()*o.cagrCost() for o in l_os if o.cagr() != '-' )
+        cagrcost = sum( o.cagrCost() for o in l_os if o.cagr() != '-' )
+        cagr = ( wtcagr / cagrcost ) if cagrcost > 0 else '-'
         return (cost,value,gain,pgain,cagr,pshare)
     @lru_cache(maxsize=16)
     def aggr(self,p): return [ (pv,*self._aggr(os)) for pv,os in self.by(p) ]
