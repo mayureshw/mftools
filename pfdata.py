@@ -106,17 +106,18 @@ class CAMSData(FData):
 
     amccode = {
         'Aditya Birla Sun Life Mutual Fund' : 'B',
-        'DSP Mutual Fund' : 'D',
-        'HDFC Mutual Fund' : 'H',
-        'ICICI Prudential Mutual Fund' : 'P',
-        'IDFC Mutual Fund' : 'G',
-        'IIFL Mutual Fund' : 'IF',
-        'Kotak Mutual Fund' : 'K',
-        'L&T Mutual Fund' : 'F',
-        'PPFAS Mutual Fund' : 'PP',
-        'SBI Mutual Fund' : 'L',
-        'Tata Mutual Fund' : 'T',
-        'Union Mutual Fund' : 'UK',
+        'DSP Mutual Fund'                   : 'D',
+        'HDFC Mutual Fund'                  : 'H',
+        'ICICI Prudential Mutual Fund'      : 'P',
+        'IDFC Mutual Fund'                  : 'G',
+        'IIFL Mutual Fund'                  : 'IF',
+        'Kotak Mutual Fund'                 : 'K',
+        'L&T Mutual Fund'                   : 'F',
+        'PPFAS Mutual Fund'                 : 'PP',
+        'SBI Mutual Fund'                   : 'L',
+        'Tata Mutual Fund'                  : 'T',
+        'Union Mutual Fund'                 : 'UK',
+        'HSBC Mutual Fund'                  : 'O',
         }
 
     def cashflow(self):
