@@ -36,7 +36,7 @@ def printTbl(tbl,
     projcul = [projc[0]] + [ul]  + projc[1:] + [ul] if colnames else projc
 
     print('\n'.join(
-        '  '.join( c.rjust(widths[i]) for i,c in enumerate(r) ) for r in projcul
+        '\t'.join( c.rjust(widths[i]) for i,c in enumerate(r) ) for r in projcul
         ),'\n',file=file)
     
 # Test driver
