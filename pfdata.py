@@ -106,6 +106,7 @@ class CAMSData(FData):
 
     amccode = {
         'Aditya Birla Sun Life Mutual Fund' : 'B',
+        'Bandhan Mutual Fund'               : 'G',
         'DSP Mutual Fund'                   : 'D',
         'HDFC Mutual Fund'                  : 'H',
         'ICICI Prudential Mutual Fund'      : 'P',
