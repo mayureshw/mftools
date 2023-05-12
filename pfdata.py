@@ -105,10 +105,12 @@ class CAMSData(FData):
     # up by prefixing hand written amc codes.
 
     amccode = {
+        '360 ONE Mutual Fund'               : 'IF',
         'Aditya Birla Sun Life Mutual Fund' : 'B',
         'Bandhan Mutual Fund'               : 'G',
         'DSP Mutual Fund'                   : 'D',
         'HDFC Mutual Fund'                  : 'H',
+        'HSBC Mutual Fund'                  : 'O',
         'ICICI Prudential Mutual Fund'      : 'P',
         'IDFC Mutual Fund'                  : 'G',
         'IIFL Mutual Fund'                  : 'IF',
@@ -118,7 +120,6 @@ class CAMSData(FData):
         'SBI Mutual Fund'                   : 'L',
         'Tata Mutual Fund'                  : 'T',
         'Union Mutual Fund'                 : 'UK',
-        'HSBC Mutual Fund'                  : 'O',
         }
 
     def cashflow(self):
