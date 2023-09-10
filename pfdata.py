@@ -8,6 +8,10 @@ import sys
 import re
 import json
 
+# To analyze canonicalization errors set this to true, it will print all VR names
+# of funds and those from CAMS for which VR name was not found
+DBGCAN = True
+
 def dt2fy(dt):
     y = dt.year
     fmt1 = '%4d'
@@ -37,6 +41,7 @@ class FData():
         r'\bPln\b',
         r'\bPlan\b',
         r'Gr\.',
+        r'GR',
         r'\bGrowth Option\b',
         r'\bGrowth\b',
         r'\bGrow\b',
@@ -52,7 +57,7 @@ class FData():
         (['Mid Cap','MidCap'],'Midcap'),
         ('Small Cap','Smallcap'),
         ('SENSEX','Sensex'),
-        ([r'\bDP\b',r'\bDir\b',r'\bDIRECT\b',r'\bDG\b',r'\bDrt\b',r'\bDIR\b'],'Direct'),
+        ([r'\bDP\b',r'\bDir\b',r'\bDIRECT\b',r'\bDG\b',r'\bDrt\b',r'\bDIR\b',r'\bDr\b'],'Direct'),
         ('Blue Chip','Bluechip'),
         (r'\bTreas\b','Treasury'),
         ([r'\bAdv\b',r'\bAd\b'],'Advantage'),
@@ -65,6 +70,7 @@ class FData():
         (r'\bEF\b','Equity'),
         (r'\bFEF\b','Focused Equity'),
         (r'Val\.','Value'),
+        (r'\bFoc\b','Focused'),
         ])
     ttypcanner = Canizer([
         ([r'-', r' +'],' '),
@@ -98,6 +104,8 @@ class VRMFData(FData):
             sys.exit(1)
         objs = [ o for csv in csvfiles for o in XlsObjs(csv,specname='vrmf') ]
         self.cnvo = { self.cname(o.fname) : o for o in objs }
+        if DBGCAN:
+            for fname in self.cnvo: print('VR entry with fname',fname)
 
 vd = VRMFData()
 cii = json.load(ciifile.open()) if ciifile.exists() else {}
@@ -264,6 +272,7 @@ class Fund:
         self.bo = cd.cnbal.get(f,None)
         self._amc = cd.cntxns[f][0].amc
         self.vo = vd.cnvo.get(f,None)
+        if DBGCAN and self.vo == None: print('Could not get VR entry for fund',f)
         self.buildmatch(cd.cntxns[f])
 
 class Portfolio:
