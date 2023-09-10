@@ -1,6 +1,6 @@
 from xls2obj import XlsObjs
 from conf import *
-from itertools import groupby
+from itertools import groupby, chain
 from functools import reduce
 from functools import lru_cache
 from datetime import datetime
@@ -87,7 +87,12 @@ class VRMFData(FData):
         cat,subcat = self.cnvo[cname].cat.split('-')
         return cat if cat in {'EQ','DT'} else 'EQ' if subcat in {'AH','AR','DAA'} else 'DT'
     def __init__(self):
-        csvfiles = list(mfdocsdir.glob('all-*-funds-*.csv'))
+        # convention prior to Aug 23, remove this after waiting for a while if they don't revert to this
+        #csvfiles = list(mfdocsdir.glob('all-*-funds-*.csv'))
+        # In Aug 2023 VR changed their file naming convention
+        csvfiles = [
+            next(mfdocsdir.glob( typ + '-*.csv' )) for typ in ['equity','debt','hybrid']
+            ]
         if len(csvfiles) != 3:
             print('VRMFData: xls file count mismatch',len(csvfiles))
             sys.exit(1)
