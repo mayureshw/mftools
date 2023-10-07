@@ -10,7 +10,7 @@ import json
 
 # To analyze canonicalization errors set this to true, it will print all VR names
 # of funds and those from CAMS for which VR name was not found
-DBGCAN = True
+DBGCAN = False
 
 def dt2fy(dt):
     y = dt.year
