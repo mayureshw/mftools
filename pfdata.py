@@ -149,7 +149,10 @@ class CAMSData(FData):
         bobjs = [ bo for bo in XlsObjs(balsfile,specname='camsbals') if bo.value ]
         pidbal = { self.prodid(bo): bo for bo in bobjs }
         tobjs = XlsObjs(txnsfile,specname='camstxns')
-        pidtxns = { pid:list(txns) for pid,txns in groupby(tobjs,lambda to:to.fid) }
+        # Unclear why, but groupby produced wrong results when 1 product was in 2 folios
+        #pidtxns = { pid:list(txns) for pid,txns in groupby(tobjs,lambda to:to.fid) }
+        pidtxns = {}
+        for t in tobjs: pidtxns.setdefault(t.fid,[]).append(t)
         pidcname = { pid:self.cname(ts[0].fname,ts[0].amc) for pid,ts in pidtxns.items() }
         self.cnbal = { pidcname[pid]:bo for pid,bo in pidbal.items() }
         self.cntxns = { pidcname[pid]:to for pid,to in pidtxns.items() }
