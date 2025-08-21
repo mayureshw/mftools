@@ -30,6 +30,8 @@ class FData():
     fncaner = Canizer([
         ([
         r'\(\w+\)',
+        r'\([Ff]ormerly.*$',
+        r'\([Ee]rstwhile.*\)',
         r'\([Ee]rstwhile.*$',
         r'\([Ff]ormerly.*$',
         r'\(Earlier.*$',
@@ -65,6 +67,8 @@ class FData():
         ([r'Eq\.',r'Equity\.',r'\bEq\b'],'Equity'),
         ('ABSL','Aditya Birla Sun Life'),
         (r'Equity&Debt','Equity & Debt'),
+        (r'Large&Mid','Large & Mid'),
+        (r'Exclus Strat','Exclusionary Strategy'),
         (r'SensexPlan','Sensex'),
         (r'\bCF\b','Cash'),
         (r'\bEF\b','Equity'),
@@ -83,7 +87,10 @@ class FData():
         'ICICI Prudential Mutual Fund' : 'ICICI Prudential',
         }
 
-    def cname(self,fname,amc=''): return ' '.join([ self.amcprefix.get(amc,''), self.fncaner.xform(fname) ]).strip()
+    def cname(self,fname,amc=''):
+        retval = ' '.join([ self.amcprefix.get(amc,''), self.fncaner.xform(fname) ]).strip()
+        if DBGCAN: print('FData.cname',fname,'->',retval)
+        return retval
     def ctxntyp(self,s): return self.ttypcanner.xform(s)
 
 class VRMFData(FData):
